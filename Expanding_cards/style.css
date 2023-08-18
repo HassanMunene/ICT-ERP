@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: gray;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.container {
+    background-color: lightblue;
+    display: flex;
+    width: 90vw;
+}
+.panel_active {
+    background-color: red;
+    margin-bottom: 10px;
+}
+.panel1 {
+    background-color: blue;
+    margin-bottom: 10px;
+}
+.panel2 {
+    background-color: green;
+    margin-bottom: 10px;
+}
+.panel3 {
+    background-color: yellow;
+    margin-bottom: 10px;
+}
+.panel4 {
+    background-color: orange;
+    margin-bottom: 10px;
+}
+.panel5 {
+    background-color: velvet;
+}
