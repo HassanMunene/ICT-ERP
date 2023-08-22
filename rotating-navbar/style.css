@@ -17,9 +17,14 @@ body {
 }
 .content {
     padding-top: 100px;
+    transform: top left;
+    transition: transform 0.4s ease-in;
 }
 .content img {
     width: 100%;
+}
+.content.show-nav {
+    transform: rotate(-20deg);
 }
 
 .circle-container {
@@ -51,11 +56,13 @@ button#open {
     transition: transform 0.4s ease-in;
 }
 button#close {
-    transform-origin: top left;
+    position: absolute;
+    left: -40px;
+    top: 30px;
     transition: transform 0.4s ease-in;
 }
 .container.show-nav .circle button#close {
-    transform: translate(40px);
+    transform: translateX(40px);
 }
 .container.show-nav .circle button#open {
     transform: rotate(80deg);
