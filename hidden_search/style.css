@@ -1,0 +1,43 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #7158e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+    margin: 0;
+}
+.search {
+    background-color: #fff;
+    height: 45px;
+    display: flex;
+}
+.input {
+    padding: 10px;
+    border: none;
+    height: 100%;
+    margin: 0;
+    font-size: 17px;
+    width: 0px;
+    transition: width 0.5s ease;
+}
+.input.active {
+    width: 200px;
+}
+.btn {
+    background-color: transparent;
+    font-size: 25px;
+    border: none;
+    cursor: pointer;
+    padding-right: 20px;
+    margin-top: 5px;
+}
+.btn:focus,
+.input:focus {
+    outline: none;
+}
+
