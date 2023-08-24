@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <title>clientHeight</title>
+        <style>
+#parent {
+    margin-top: 10px;
+    height: 200px;
+    width: 200px;
+    overflow: auto;
+    margin: 20px;
+    background-color: blue;
+}
+#demo {
+    height: 250px;
+    padding: 20px;
+    background-color: beige;
+    border: 2px ridge red;
+}
+        </style>
+    </head>
+    <body>
+        <button onclick="getHeight()">Get client height</button>
+        <div id="parent">
+            <div id="demo">
+                <ul>
+                    <li>a</li>
+                    <li>b</li>
+                    <li>c</li>
+                </ul>
+            </div>
+        </div>
+        <article id="display"></article>
+
+        <script>
+            function getHeight() {
+                            let myItem = document.getElementById("demo");
+                            let y = myItem.clientHeight;
+                            document.getElementById('display').innerHTML = "Client height is " + y + "px";
+                        }
+        </script>
+    </body>
+</html>
