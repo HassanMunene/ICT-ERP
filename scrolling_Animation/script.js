@@ -13,11 +13,11 @@ window.addEventListener('load', () => {
 
 window.addEventListener('scroll', () => {
     if (container.scrollHeight > window.innerHeight) {
-        if (!isActivate && container.getBoundClientRect().top <= 0) {
+        if (!isActivated && container.getBoundingClientRect().top <= 0) {
             isActivated = true;
             addActiveClassToBoxes();
         }
-        else if (isActivated && container.getBoundClientRect().top > 0) {
+        else if (isActivated && container.getBoundingClientRect().top > 0) {
             isActivated = false;
             removeActiveClassFromBoxes();
         }
