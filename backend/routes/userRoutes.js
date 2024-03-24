@@ -19,18 +19,21 @@ router.post('/login', async(req, res) => {
     const {email, password} = req.body;
 
     try {
-        const user = await User.findByCredentials(email, password);
+        const user = await User.findUserByCredentials(email, password);
         res.json(user);
     } catch(error) {
         res.status(400).send(error.message);
     }
 })
 
-// retrieve the users when we navigate to the home page together with their orders
-/*router.get('/', async(req, res) => {
+// retrieve the users when we navigate to the home page together with their orders users that
+// are not admins
+router.get('/', async(req, res) => {
     try {
         const users = await User.find({ isAdmin: false }).populate('orders');
     } catch (error) {
         res.status(400).send(error.message);
     }
-})*/
+})
+
+module.exports = router;

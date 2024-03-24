@@ -16,7 +16,7 @@ const UserSchema = mongoose.Schema({
             validator: function(str){
                 return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(str);
             },
-            message: props => `${props.value} is not a valid email`
+            message: (props) => `${props.value} is not a valid email`
         }
     },
 
@@ -37,7 +37,7 @@ const UserSchema = mongoose.Schema({
             count: 0
         }
     },
-    
+
     notifications: {
         type: Array,
         default: []
@@ -53,7 +53,7 @@ const UserSchema = mongoose.Schema({
 }, {minimize: false});
 
 
-UserSchema.statics.findUserCredentials = async function(email, password) {
+UserSchema.statics.findUserByCredentials = async function(email, password) {
     const user = await User.findOne({email});
     if (!user) throw new Error('Invalid credentials');
     const isSamePassword = bcrypt.compareSync(password, user.password);
@@ -71,21 +71,19 @@ UserSchema.methods.toJSON = function () {
 }
 
 // before saving encrypt(hash) the password
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function(next) {
     const user = this;
 
     if (!user.isModified('password')) return next();
 
     bcrypt.genSalt(10, function(err, salt) {
         if (err) return next(err);
-
         bcrypt.hash(user.password, salt, function(err, hash) {
             if(err) return next(err);
-
             user.password = hash;
             next();
         })
-    }) 
+    })
 })
 
 UserSchema.pre('remove', function(next) {
