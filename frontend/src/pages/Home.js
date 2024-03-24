@@ -3,11 +3,12 @@ import { Row, Col } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import categories from '../categories';
 import { LinkContainer } from "react-router-bootstrap";
+import "./Home.css";
 
 function Home() {
   return (
     <div>
-      <img src='https://res.cloudinary.com/learn-code-10/image/upload/v1653947013/yqajnhqf7usk56zkwqi5.png' alt='home-banner' className='home-banner'/>
+      <div className='home-banner'>Home</div>
       <div className='featured-products-container container mt-4'>
         <h2>Last products</h2>
         {/* last products from backend here*/}
@@ -28,7 +29,7 @@ function Home() {
           {categories.map((category) => (
             <LinkContainer to={`/category/${category.name.toLocaleLowerCase()}`}>
               <Col md={4}>
-                <div style={{backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${category.img})`, gap: "10px"}} className='category-tile'>
+                <div style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${category.img})`, gap: "10px" }} className='category-tile'>
                   {category.name}
                 </div>
               </Col>
