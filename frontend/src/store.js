@@ -8,7 +8,7 @@ import appApi from "./services/appApi";
 import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
-import thunk from "redux-thunk";
+//import { thunk } from "redux-thunk";
 
 // we need to combine them to be in the same object
 const reducer = combineReducers({
@@ -29,7 +29,7 @@ const persistedReducer = persistReducer(persistConfig, reducer);
 // now we create a store
 const store = configureStore({
     reducer: persistedReducer,
-    middleware: [thunk, appApi.middleware],
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(appApi.middleware),
 });
 
 export default store;
