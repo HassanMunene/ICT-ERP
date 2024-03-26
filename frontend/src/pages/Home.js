@@ -24,11 +24,12 @@ function Home() {
       <div className='home-banner'>Home</div>
       <div className='featured-products-container container mt-4'>
         <h2>Last products</h2>
+        
         {/* last products from backend here*/}
-        {console.log(products)}
-        {products.map((product) => (
-          <ProductPreview {...product}/>
-        ))}
+        <div className="d-flex justify-content-center flex-wrap">
+          {lastProducts.map((product) => (<ProductPreview {...product}/>) )}
+        </div>
+
         <div>
           <Link to="/category/all" style={{textAlign: "right", display: "block", textDecoration: "None"}}>
             See more {">>"}

@@ -6,6 +6,7 @@ import Loading from "../components/Loading";
 import SimilarProduct from "../components/SimilarProduct";
 import { Container, Row, Col, Badge, ButtonGroup, Form, Button } from "react-bootstrap";
 import AliceCarousel from "react-alice-carousel";
+import "react-alice-carousel/lib/alice-carousel.css";
 import { LinkContainer } from "react-router-bootstrap";
 import "./ProductPage.css";
 
@@ -31,6 +32,7 @@ function ProductPage () {
 		return <Loading/>
 	}
 
+	//image responsive depending on screen size in alice corousel
 	const responsive = {
         0: { items: 1 },
         568: { items: 2 },
@@ -42,7 +44,6 @@ function ProductPage () {
 	));
 
 	let similarProducts = [];
-
 	if(similar) {
 		similarProducts = similar.map((product, idx) => (
 			<div className="item" data-value={idx}>
@@ -60,11 +61,11 @@ function ProductPage () {
                 	<h1>{product.name}</h1>
                 	<p><Badge bg="primary">{product.category}</Badge></p>
                 	<p className="product__price">Ksh{product.price}</p>
-                	<p style={{ textAlign: "justify" }} className="py-3">
+                	<p style={{ textAlign: "center" }} className="py-3">
                         <strong>Description:</strong> {product.description}
                     </p>
                     {user && !user.isAdmin && (
-                        <ButtonGroup style={{ width: "90%" }}>
+                        <ButtonGroup style={{ width: "80%" }}>
                             <Form.Select size="lg" style={{ width: "40%", borderRadius: "0" }}>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -72,7 +73,7 @@ function ProductPage () {
                                 <option value="4">4</option>
                                 <option value="5">5</option>
                             </Form.Select>
-                            <Button size="lg">
+                            <Button size="lg" disabled={!user}>
                                 Add to cart
                             </Button>
                         </ButtonGroup>
