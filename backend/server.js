@@ -4,7 +4,7 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const User = require('./models/User');
-const userRoutes = require('./routes/userRoutes.js');
+
 require('./connection');
 
 // import the Server class from socket.io library
@@ -16,6 +16,10 @@ const io = new Server(server, {
     methods: '*'
 })
 
+const userRoutes = require('./routes/userRoutes.js');
+const productRoutes = require('./routes/productRoutes');
+const imageRoutes = require('./routes/imageRoutes');
+
 
 app.get('/', (req, res) => {
     res.send('Hello mate');
@@ -23,7 +27,9 @@ app.get('/', (req, res) => {
 app.use(cors());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use('/user', userRoutes);
+app.use('/users', userRoutes);
+app.use('/products', productRoutes);
+app.use('/images', imageRoutes);
 
 server.listen(8081, () => {
     console.log('Server is running at port 8081');

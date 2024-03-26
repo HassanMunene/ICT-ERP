@@ -4,6 +4,7 @@ import { Alert, Col, Container, Form, Row, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useCreateProductMutation } from "../services/appApi";
 import { MdCancel } from "react-icons/md";
+import axios from 'axios';
 import "./NewProduct.css";
 
 function NewProduct() {
@@ -29,6 +30,16 @@ function NewProduct() {
         widget.open();
     }
 
+    function handleRemoveImg (imageObject) {
+        setImgToRemove(imageObject.public_id);
+        axios.delete(`http://localhost:8081/images/${imageObject.public_id}`)
+        .then((response) => {
+            setImgToRemove(null);
+            setImages((prev) => prev.filter((img) => img.public_id !== imageObject.public_id));
+        })
+        .catch((error) => console.log("Error removing the image:", error));
+    }
+
     function handleSubmit(e) {
         e.preventDefault();
 
@@ -44,7 +55,7 @@ function NewProduct() {
             }
         })
         .catch((error) => {
-            console.log("error creating product:", error.message);
+            console.log("error creating product:", error);
         }) 
     }
 
@@ -90,7 +101,7 @@ function NewProduct() {
                                 {images.map((image) => (
                                     <div className="image-preview">
                                         <img src={image.url} alt="prodImg"/>
-                                        <div className="removeImg" onClick={handleRemoveImg(image)}><MdCancel /></div>
+                                        <div className="removeImg" onClick={() => handleRemoveImg(image)}><MdCancel /></div>
                                     </div>
                                 ))}
                             </div>
