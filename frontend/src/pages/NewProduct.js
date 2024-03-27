@@ -88,10 +88,11 @@ function NewProduct() {
                                 <option disabled selected>
                                     -- Select One --
                                 </option>
-                                <option value="technology">technology</option>
-                                <option value="tablets">tablets</option>
-                                <option value="phones">phones</option>
-                                <option value="laptops">laptops</option>
+                                <option value="technology">Technology</option>
+                                <option value="tablets">Tablets</option>
+                                <option value="phones">Phones</option>
+                                <option value="laptops">Laptops</option>
+                                <option value="books">Books</option>
                             </Form.Select>
                         </Form.Group>
 

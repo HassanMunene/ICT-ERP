@@ -8,6 +8,7 @@ import { Button } from "react-bootstrap";
 import { LinkContainer } from 'react-router-bootstrap';
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../features/userSlice";
+import { FaShoppingCart } from "react-icons/fa";
 import './Navigation.css';
 
 
@@ -37,7 +38,7 @@ function Navigation() {
                         {user && !user.isAdmin && (
                             <LinkContainer to="/cart">
                                 <Nav.Link>
-                                    <i className="fas fa-shopping-cart"></i>
+                                    <FaShoppingCart />
                                     {user?.cart.count > 0 && (
                                         <span className="badge badge-warning" id="cartcount">
                                             {user.cart.count}

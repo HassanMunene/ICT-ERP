@@ -8,6 +8,7 @@ import { Container, Row, Col, Badge, ButtonGroup, Form, Button } from "react-boo
 import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
 import { LinkContainer } from "react-router-bootstrap";
+import { useAddToCartMutation } from "../services/appApi";
 import "./ProductPage.css";
 
 function ProductPage () {
@@ -15,6 +16,7 @@ function ProductPage () {
 	const user = useSelector((state) => state.user);
 	const [product, setProduct] = useState(null);
 	const [similar, setSimilar] = useState(null);
+	const [addToCart, { isSuccess }] = useAddToCartMutation();
 
 	useEffect(() => {
 		axiosInstance.get(`/products/${id}`)
@@ -31,6 +33,17 @@ function ProductPage () {
 	if(!product) {
 		return <Loading/>
 	}
+
+	//function that handles adding items to cart
+	function handleAddToCart () {
+		addToCart({
+			userId: user._id,
+			productId: id,
+			price: product.price,
+			image: product.pictures[0].url
+		})
+	}
+
 
 	//image responsive depending on screen size in alice corousel
 	const responsive = {
@@ -73,7 +86,7 @@ function ProductPage () {
                                 <option value="4">4</option>
                                 <option value="5">5</option>
                             </Form.Select>
-                            <Button size="lg" disabled={!user}>
+                            <Button size="lg" disabled={!user} onClick={handleAddToCart}>
                                 Add to cart
                             </Button>
                         </ButtonGroup>

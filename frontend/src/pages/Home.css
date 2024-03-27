@@ -11,6 +11,11 @@
     display: block;
     margin: 0 auto;
 }
+.recent-products-container {
+    max-width: 1200px;
+    display: block;
+    margin: 0 auto;
+}
 .category-tile {
     height: 250px;
     background-size: cover;
@@ -29,3 +34,4 @@
 .category-tile:hover {
     transform: scale(1.05);
 }
+

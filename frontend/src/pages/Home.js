@@ -8,6 +8,7 @@ import axiosInstance from '../axios';
 import { useDispatch, useSelector } from "react-redux";
 import { updateProducts } from "../features/productSlice";
 import ProductPreview from "../components/ProductPreview";
+import { Container } from "react-bootstrap";
 import "./Home.css";
 
 function Home() {
@@ -23,7 +24,7 @@ function Home() {
     <div>
       <div className='home-banner'>Home</div>
       <div className='featured-products-container container mt-4'>
-        <h2>Last products</h2>
+        <h2>Recent products</h2>
         
         {/* last products from backend here*/}
         <div className="d-flex justify-content-center flex-wrap">
@@ -42,7 +43,7 @@ function Home() {
         <img src='https://res.cloudinary.com/learn-code-10/image/upload/v1654093280/xkia6f13xxlk5xvvb5ed.png' alt='sale-banner'/>
       </div>
       <div className='recent-products-container mt-4'>
-        <h2>categories</h2>
+        <h2>Categories</h2>
         <Row>
           {categories.map((category) => (
             <LinkContainer to={`/category/${category.name.toLocaleLowerCase()}`}>

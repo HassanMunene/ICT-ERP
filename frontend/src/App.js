@@ -8,13 +8,16 @@ import Signup from './pages/Signup';
 import NewProduct from './pages/NewProduct';
 import ProductPage from './pages/ProductPage';
 import CategoryPage from './pages/CategoryPage';
+import CartPage from './pages/CartPage';
 import { useSelector } from 'react-redux';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   const user = useSelector((state) => state.user);
   return (
     <div className='App'>
       <BrowserRouter>
+        <ScrollToTop/>
         <Navigation/>
         <Routes>
           <Route index element={<Home/>}/>
@@ -22,6 +25,11 @@ function App() {
             <>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+            </>
+          )}
+          {user && (
+            <>
+              <Route path="/cart" element={<CartPage />} />
             </>
           )}
           <Route path="/new-product" element={<NewProduct/>}/>
