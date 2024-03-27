@@ -9,6 +9,7 @@ import AliceCarousel from "react-alice-carousel";
 import "react-alice-carousel/lib/alice-carousel.css";
 import { LinkContainer } from "react-router-bootstrap";
 import { useAddToCartMutation } from "../services/appApi";
+import ToastMessage from '../components/ToastMessage';
 import "./ProductPage.css";
 
 function ProductPage () {
@@ -91,6 +92,7 @@ function ProductPage () {
                             </Button>
                         </ButtonGroup>
                     )}
+                    {isSuccess && <ToastMessage bg="info" title="Added to cart" body={`${product.name} is in your cart`} />}
                     {user && user.isAdmin && (
                         <LinkContainer to={`/product/${product._id}/edit`}>
                             <Button size="lg">Edit Product</Button>

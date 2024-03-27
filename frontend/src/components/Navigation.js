@@ -38,10 +38,11 @@ function Navigation() {
                         {user && !user.isAdmin && (
                             <LinkContainer to="/cart">
                                 <Nav.Link>
-                                    <FaShoppingCart />
+                                    <FaShoppingCart size={20}/>
                                     {user?.cart.count > 0 && (
                                         <span className="badge badge-warning" id="cartcount">
                                             {user.cart.count}
+
                                         </span>
                                     )}
                                 </Nav.Link>

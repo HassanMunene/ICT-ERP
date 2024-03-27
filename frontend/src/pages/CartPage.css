@@ -1,0 +1,19 @@
+.table-responsive-sm {
+    max-height: 70vh;
+    overflow: scroll;
+}
+
+.faPlus,
+.faMinus {
+    cursor: pointer;
+    display: inline-block;
+    color: green;
+}
+
+.faPlus {
+    margin-left: 5px;
+}
+
+.faMinus {
+    margin-right: 5px;
+}
