@@ -5,6 +5,7 @@ import Loading from "../components/Loading";
 import ProductPreview from "../components/ProductPreview";
 import { Col, Container, Row } from "react-bootstrap";
 import Pagination from "../components/Pagination";
+import "./CategoryPage.css";
 
 function CategoryPage () {
 	const {category} = useParams();
@@ -14,14 +15,15 @@ function CategoryPage () {
 
 	useEffect(() => {
 		setLoading(true);
-		axiosInstance.get('/products/category/${category}')
+		axiosInstance.get(`/products/category/${category}`)
 		.then((responseData) => {
 			setLoading(false);
 			setProducts(responseData.data);
+			console.log(responseData.data);
 		})
 		.catch((error) => {
 			setLoading(false);
-			console.log(error);
+			console.log("Error getting the data on specific category:", error);
 		});
 
 	}, [category]);
@@ -49,7 +51,11 @@ function CategoryPage () {
 				<Container>
 					<Row>
 						<Col md={{ span: 10, offset: 1}}>
-							<Pagination data={productsSearch} RenderComponent={ProductSearch} pageLimit={1} dataLimit={5} tablePagination={false} />
+							<div className="d-flex justify-content-center align-items-center flex-wrap">
+								{productsSearch.map((product) => (
+									<ProductPreview {...product} />
+								))}
+							</div>
 						</Col>
 					</Row>
 				</Container>
