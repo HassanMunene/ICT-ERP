@@ -43,4 +43,19 @@ router.get('/', async(req, res)=> {
     }
 })
 
+// mark order as delivered
+router.patch('/:id/mark-delivered', async(req, res)=> {
+    const {ownerId} = req.body;
+    const {id} = req.params;
+
+    try {
+        const user = await User.findById(ownerId);
+        await Order.findByIdAndUpdate(id, {status: 'delivered'});
+        const orders = await Order.find().populate('owner', ['email', 'name']);
+        res.status(200).json(orders)
+    } catch (e) {
+        res.status(400).json(e.message);
+    }
+})
+
 module.exports = router;
