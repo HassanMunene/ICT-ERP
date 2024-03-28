@@ -5,6 +5,7 @@ import { MdOutlineCancelPresentation } from "react-icons/md";
 import { FaCirclePlus } from "react-icons/fa6";
 import { FaCircleMinus } from "react-icons/fa6";
 import { useIncreaseCartProductMutation, useDecreaseCartProductMutation, useRemoveFromCartMutation } from "../services/appApi";
+import CheckoutForm from '../components/CheckoutForm';
 import "./CartPage.css";
 
 function CartPage() {
@@ -32,7 +33,7 @@ function CartPage() {
 						{cart.length == 0 ? (
 	                        <Alert variant="info">Shopping cart is empty. Add products to your cart</Alert>
 	                    ) : (
-	                    	<div>Payment here</div>
+	                    	<CheckoutForm/>
 	                    )}
 					</Col>
 					{cart.length > 0 && (

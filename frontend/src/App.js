@@ -9,6 +9,8 @@ import NewProduct from './pages/NewProduct';
 import ProductPage from './pages/ProductPage';
 import CategoryPage from './pages/CategoryPage';
 import CartPage from './pages/CartPage';
+import OrdersPage from './pages/OrdersPage';
+import AdminDashboard from "./pages/AdminDashboard";
 import { useSelector } from 'react-redux';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -30,6 +32,12 @@ function App() {
           {user && (
             <>
               <Route path="/cart" element={<CartPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+            </>
+          )}
+          {user && user.isAdmin && (
+            <>
+              <Route path="/admin" element={<AdminDashboard />} />
             </>
           )}
           <Route path="/new-product" element={<NewProduct/>}/>

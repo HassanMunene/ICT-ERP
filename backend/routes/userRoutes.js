@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const User = require('../models/User');
+const Order = require('../models/Order');
 
 //signup route
 router.post('/signup', async(req, res) => {
@@ -36,4 +37,16 @@ router.get('/', async(req, res) => {
     }
 })
 
+// get user orders:
+router.get('/:id/orders', async (req, res)=> {
+    const {id} = req.params;
+
+    try {
+        const user = await User.findById(id).populate('orders');
+        res.json(user.orders);
+    } catch (error) {
+        console.log('error retrieving users orders in user route:', error);
+        res.status(400).send(error.message);
+    }
+})
 module.exports = router;

@@ -162,7 +162,8 @@ router.post('/decrease-cart', async(req, res) => {
 
 router.post('/remove-from-cart', async(req, res)=> {
   const {userId, productId, price} = req.body;
-  
+
+  console.log("req to remove from cart");
   try {
     const user = await User.findById(userId);
     const userCart = user.cart;

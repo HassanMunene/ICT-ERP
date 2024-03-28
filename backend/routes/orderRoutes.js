@@ -1,0 +1,46 @@
+const router = require('express').Router();
+const Order = require('../models/Order');
+const User = require('../models/User');
+
+//creating an order
+router.post('/', async(req, res)=> {
+    const {userId, cart, county, constituency, localArea} = req.body;
+    console.log(req.body);
+
+    try {
+        const user = await User.findById(userId);
+        const orderCount = cart.count;
+        const orderTotal = cart.total;
+        const order = await Order.create({
+            owner: user._id,
+            products: cart,
+            county: county,
+            constituency: constituency,
+            localArea: localArea
+        });
+        order.count = orderCount;
+        order.total = orderTotal;
+        await order.save();
+        user.cart =  {total: 0, count: 0};
+        user.orders.push(order);
+        user.markModified('orders');
+        await user.save();
+        res.status(200).json(user)
+    } catch (e) {
+        console.log("error creating the order:", e);
+        res.status(400).json(e.message)
+    }
+})
+
+// getting all the orders
+router.get('/', async(req, res)=> {
+    try {
+        const orders = await Order.find().populate('owner', ['email', 'name']);
+        res.status(200).json(orders);
+    } catch (e) {
+        console.log("error retrieving the orders:", error);
+        res.status(400).json(e.message)
+    }
+})
+
+module.exports = router;
