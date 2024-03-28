@@ -13,7 +13,7 @@ const {Server} = require('socket.io');
 // instance of the http server instance
 const io = new Server(server, {
     cors: '*',
-    methods: '*'
+    methods: ['GET', 'POST', 'PATCH', 'DELETE']
 })
 
 const userRoutes = require('./routes/userRoutes.js');
@@ -48,3 +48,4 @@ app.post('/create-payment', async(req, res)=> {
 server.listen(8081, () => {
     console.log('Server is running at port 8081');
 })
+app.set('socketio', io);

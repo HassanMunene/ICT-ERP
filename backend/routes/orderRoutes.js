@@ -3,7 +3,13 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 
 //creating an order
+/*
+ * once we create an order we want to send a notification to the admin by accessing
+ * the io instance we set in the entry file
+ * the send the message to the admin
+ */
 router.post('/', async(req, res)=> {
+    const io = req.app.get('socketio');
     const {userId, cart, county, constituency, localArea} = req.body;
     console.log(req.body);
 
@@ -23,6 +29,10 @@ router.post('/', async(req, res)=> {
         await order.save();
         user.cart =  {total: 0, count: 0};
         user.orders.push(order);
+        /*emit an event */
+        const notification = {status: 'unread', message: `New order from ${user.name}`, time: new Date()};
+        io.sockets.emit('newOrder', notification);
+
         user.markModified('orders');
         await user.save();
         res.status(200).json(user)
@@ -45,6 +55,7 @@ router.get('/', async(req, res)=> {
 
 // mark order as delivered
 router.patch('/:id/mark-delivered', async(req, res)=> {
+    const io = req.app.get('socketio');
     const {ownerId} = req.body;
     const {id} = req.params;
 
@@ -52,6 +63,10 @@ router.patch('/:id/mark-delivered', async(req, res)=> {
         const user = await User.findById(ownerId);
         await Order.findByIdAndUpdate(id, {status: 'delivered'});
         const orders = await Order.find().populate('owner', ['email', 'name']);
+        const notification = {status: 'unread', message: `Order ${id} shipped with success`, time: new Date()};
+        io.socket.emit("notification", notification, ownerId);
+        user.notifications.push(notification);
+        await user.save();
         res.status(200).json(orders)
     } catch (e) {
         res.status(400).json(e.message);

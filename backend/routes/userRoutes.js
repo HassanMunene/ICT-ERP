@@ -27,11 +27,11 @@ router.post('/login', async(req, res) => {
     }
 })
 
-// retrieve the users when we navigate to the home page together with their orders users that
-// are not admins
+// retrieve the users when we navigate to the home page together with their orders users that are not admins
 router.get('/', async(req, res) => {
     try {
         const users = await User.find({ isAdmin: false }).populate('orders');
+        res.status(200).json(users);
     } catch (error) {
         res.status(400).send(error.message);
     }

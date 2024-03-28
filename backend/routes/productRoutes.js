@@ -48,13 +48,16 @@ router.patch("/:id", async(req, res) => {
 router.delete("/:id", async(req, res) => {
 	const{id} = req.params;
 	const{user_id} = req.body;
+    console.log(user_id);
 	try {
 		const user = await User.findById(user_id);
+        console.log(user);
 		if (!user.isAdmin) return res.status(401).json("you dont have permission");
 		await Product.findByIdAndDelete(id);
 		const products = await Product.find();
 		res.status(200).json(products);
 	} catch(error) {
+        console.log("Error deleting the product:", error)
 		res.status(400).send(error.message);
 	}
 })
