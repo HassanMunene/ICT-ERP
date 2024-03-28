@@ -32,7 +32,6 @@ function CheckoutForm() {
         }
         await axios.post("http://localhost:8081/create-payment", orderPayload, {headers})
         .then((responseData) => {
-            console.log(responseData.data);
             if (responseData.data === "success") {
                 createOrder({ userId: user._id, cart: user.cart, county: county, constituency: constituency, localArea: localArea })
                 .then((responseData) => {

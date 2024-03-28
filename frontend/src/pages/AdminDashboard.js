@@ -1,8 +1,8 @@
 import React from "react";
 import { Container, Nav, Tab, Col, Row } from "react-bootstrap";
-//import ClientsAdminPage from "../components/ClientsAdminPage";
-//import DashboardProducts from "../components/DashboardProducts";
-//import OrdersAdminPage from "../components/OrdersAdminPage";
+import ClientsAdminPage from "../components/ClientsAdminPage";
+import DashboardProducts from "../components/DashboardProducts";
+import OrdersAdminPage from "../components/OrdersAdminPage";
 import axiosInstance from '../axios';
 import './AdminDashboard.css'
 
@@ -26,7 +26,15 @@ function AdminDashboard() {
                     </Col>
                     <Col sm={9}>
                         <Tab.Content>
-                        Hello
+                            <Tab.Pane eventKey="products">
+                                <DashboardProducts />
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="orders">
+                                <OrdersAdminPage />
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="clients">
+                                <ClientsAdminPage />
+                            </Tab.Pane>
                         </Tab.Content>
                     </Col>
                 </Row>

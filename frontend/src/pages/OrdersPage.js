@@ -14,7 +14,6 @@ function OrdersPage() {
         setLoading(true);
         axiosInstance.get(`/users/${user._id}/orders`).then((responseData) => {
             setLoading(false);
-            console.log(responseData.data);
             setOrders(responseData.data);
         }).catch((error) => {
             setLoading(false);

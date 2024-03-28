@@ -42,12 +42,12 @@ function Navigation() {
                                     {user?.cart.count > 0 && (
                                         <span className="badge badge-warning" id="cartcount">
                                             {user.cart.count}
-
                                         </span>
                                     )}
                                 </Nav.Link>
                             </LinkContainer>
                         )}
+                        
 
                         {/* if user is now available*/}
 

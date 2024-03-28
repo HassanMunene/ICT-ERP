@@ -12,7 +12,7 @@ export const userSlice = createSlice({
         addNotification: (state, action) => {
             state.notifications.unshift(action.payload);
         },
-        resetNotification: (state) => {
+        resetNotifications: (state) => {
             state.notifications.forEach((obj) => {
                 obj.status = "read";
             })

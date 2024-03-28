@@ -1,3 +1,4 @@
+import {useEffect} from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -11,11 +12,31 @@ import CategoryPage from './pages/CategoryPage';
 import CartPage from './pages/CartPage';
 import OrdersPage from './pages/OrdersPage';
 import AdminDashboard from "./pages/AdminDashboard";
-import { useSelector } from 'react-redux';
+import EditProductPage from "./pages/EditProductPage";
+import { useSelector, useDispatch } from 'react-redux';
 import ScrollToTop from './components/ScrollToTop';
+import { io } from "socket.io-client";
+import { addNotification } from "./features/userSlice";
 
 function App() {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    console.log("entered useEffect");
+    const socket = io("ws://localhost:8081");
+    socket.off("notification").on("notification", (msgObj, user_id) => {
+      console.log(user_id, user._id);
+      if (user_id === user._id) {
+        dispatch(addNotification(msgObj));
+      }
+    });
+    socket.off('newOrder').on("newOrder", (msgObj) => {
+      if (user.isAdmin) {
+        dispatch(addNotification(msgObj));
+      }
+    });
+  }, [])
   return (
     <div className='App'>
       <BrowserRouter>
@@ -38,6 +59,7 @@ function App() {
           {user && user.isAdmin && (
             <>
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/products/:id/edit" element={<EditProductPage />} />
             </>
           )}
           <Route path="/new-product" element={<NewProduct/>}/>
