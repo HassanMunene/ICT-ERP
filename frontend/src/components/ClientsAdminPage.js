@@ -21,7 +21,7 @@ function ClientsAdminPage() {
     }, []);
 
     if (loading) return <Loading />;
-    if (users?.length == 0) return <h2 className="py-2 text-center">No users yet</h2>;
+    if (users?.length === 0) return <h2 className="py-2 text-center">No users yet</h2>;
 
     return (
         <Table responsive striped bordered hover>
@@ -34,7 +34,7 @@ function ClientsAdminPage() {
             </thead>
             <tbody>
                 {users.map((user) => (
-                    <tr>
+                    <tr key={user._id}>
                         <td>{user._id}</td>
                         <td>{user.name}</td>
                         <td>{user.email}</td>
@@ -43,8 +43,6 @@ function ClientsAdminPage() {
             </tbody>
         </Table>
     );
-
-    return <div>ClientsAdminPage</div>;
 }
 
 export default ClientsAdminPage;

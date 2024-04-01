@@ -23,22 +23,21 @@ function App() {
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    console.log("entered useEffect");
     const socket = io("ws://localhost:8081");
     socket.off("notification").on("notification", (msgObj, user_id) => {
-      console.log(user_id, user._id);
-      if (user_id === user._id) {
+      if (user_id === user?._id) {
         dispatch(addNotification(msgObj));
       }
     });
-    socket.off('newOrder').on("newOrder", (msgObj) => {
-      if (user.isAdmin) {
+    socket.off('new-order').on("new-order", (msgObj) => {
+      if (user?.isAdmin) {
         dispatch(addNotification(msgObj));
       }
     });
   }, [])
   return (
     <div className='App'>
+
       <BrowserRouter>
         <ScrollToTop/>
         <Navigation/>

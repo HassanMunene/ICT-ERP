@@ -4,13 +4,12 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useDeleteProductMutation } from "../services/appApi";
 import "./DashboardProducts.css";
-import Pagination from "./Pagination";
 
 function DashboardProducts() {
     const products = useSelector((state) => state.products);
     console.log(products);
     const user = useSelector((state) => state.user);
-    const [deleteProduct, { isLoading, isSuccess }] = useDeleteProductMutation();
+    const [deleteProduct] = useDeleteProductMutation();
 
     function handleDeleteProduct(id) {
         // logic here
@@ -32,7 +31,7 @@ function DashboardProducts() {
             <tbody>
                 {products.map((product) => (
                     <tr key={product._id}>
-                        <td><img src={product.pictures[0].url} className="dashboard-product-preview"/></td>
+                        <td><img src={product.pictures[0].url} alt="product-img" className="dashboard-product-preview"/></td>
                         <td>{product._id}</td>
                         <td>{product.name}</td>
                         <td>{product.price}</td>

@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import { Alert, Button, Col, Form, Row } from "react-bootstrap";
+import { Alert, Button, Col, Form} from "react-bootstrap";
 import { useSelector } from "react-redux";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ function CheckoutForm() {
     const [constituency, setConstituency] = useState("");
     const [localArea, setLocalArea] = useState("");
     const navigate = useNavigate();
-    const [createOrder, { isLoading, isError, isSuccess }] = useCreateOrderMutation();
+    const [createOrder, { isLoading, isError }] = useCreateOrderMutation();
 
     async function handlePay(event) {
         event.preventDefault();
