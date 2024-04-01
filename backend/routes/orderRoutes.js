@@ -31,7 +31,7 @@ router.post('/', async(req, res)=> {
         user.orders.push(order);
         /*emit an event */
         const notification = {status: 'unread', message: `New order from ${user.name}`, time: new Date()};
-        io.sockets.emit('newOrder', notification);
+        io.sockets.emit('new-order', notification);
 
         user.markModified('orders');
         await user.save();
@@ -64,12 +64,13 @@ router.patch('/:id/mark-delivered', async(req, res)=> {
         await Order.findByIdAndUpdate(id, {status: 'delivered'});
         const orders = await Order.find().populate('owner', ['email', 'name']);
         const notification = {status: 'unread', message: `Order ${id} shipped with success`, time: new Date()};
-        io.socket.emit("notification", notification, ownerId);
+        io.sockets.emit("notification", notification, ownerId);
         user.notifications.push(notification);
         await user.save();
         res.status(200).json(orders)
-    } catch (e) {
-        res.status(400).json(e.message);
+    } catch (error) {
+        console.log("error marking delivered:", error);
+        res.status(400).json(error.message);
     }
 })
 
