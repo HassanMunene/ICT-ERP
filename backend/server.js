@@ -12,8 +12,10 @@ const {Server} = require('socket.io');
 // create an instance of Socket io server by passing an
 // instance of the http server instance
 const io = new Server(server, {
-    cors: '*',
-    methods: ['GET', 'POST', 'PATCH', 'DELETE']
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST', 'PATCH', 'DELETE']
+    }
 })
 
 const userRoutes = require('./routes/userRoutes.js');
@@ -33,6 +35,8 @@ app.use('/products', productRoutes);
 app.use('/images', imageRoutes);
 app.use('/orders', orderRoutes);
 
+app.set('socketio', io);
+
 app.post('/create-payment', async(req, res)=> {
   const {amount, email} = req.body;
   console.log(amount, email);
@@ -48,4 +52,3 @@ app.post('/create-payment', async(req, res)=> {
 server.listen(8081, () => {
     console.log('Server is running at port 8081');
 })
-app.set('socketio', io);
