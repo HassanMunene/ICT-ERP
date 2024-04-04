@@ -23,10 +23,8 @@ function Navigation() {
     function handleLogout () {
         dispatch(logout());
     }
-
-    {/*To show how many messages we have left on the bell icon*/}
     const unreadNotifications = user?.notifications.reduce((accumulator, item) => {
-        if (item.status == "unread") {
+        if (item.status === "unread") {
             return accumulator += 1
         }
         return accumulator;
@@ -75,7 +73,7 @@ function Navigation() {
                                 </Nav.Link>
                             </LinkContainer>
                         )}
-                        
+
 
                         {/* if user is now available or rather logged In*/}
 
@@ -105,7 +103,7 @@ function Navigation() {
                                             </LinkContainer>
                                         </>
                                     )}
-                                    <NavDropdown.Divider />    
+                                    <NavDropdown.Divider />
                                     <Button variant="danger" onClick={handleLogout} className="logout-btn">
                                         Logout
                                     </Button>

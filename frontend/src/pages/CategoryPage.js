@@ -4,7 +4,6 @@ import axiosInstance from '../axios';
 import Loading from "../components/Loading";
 import ProductPreview from "../components/ProductPreview";
 import { Col, Container, Row } from "react-bootstrap";
-import Pagination from "../components/Pagination";
 import "./CategoryPage.css";
 
 function CategoryPage () {
@@ -32,10 +31,6 @@ function CategoryPage () {
 		<Loading/>
 	}
 	const productsSearch = products.filter((product) => product.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-	function ProductSearch ({ _id, category, name, pictures }) {
-		return <ProductPreview _id={_id} category={category} name={name} pictures={pictures}/>
-	}
 
 	return (
 		<div className="category-page-container">

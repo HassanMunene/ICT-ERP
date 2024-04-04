@@ -30,7 +30,7 @@ function CartPage() {
 				<Row>
 					<Col md={7}>
 						<h1 className="pt-2 h3">Shopping cart</h1>
-						{cart.length == 0 ? (
+						{cart.length === 0 ? (
 	                        <Alert variant="info">Shopping cart is empty. Add products to your cart</Alert>
 	                    ) : (
 	                    	<CheckoutForm/>
@@ -56,7 +56,7 @@ function CartPage() {
 	                                            <td>&nbsp;</td>
 	                                            <td>
 	                                                {!isLoading && <MdOutlineCancelPresentation style={{ marginRight: 10, cursor: "pointer" }} onClick={() => removeFromCart({ productId: item._id, price: item.price, userId: user._id })}/>}
-	                                                <img src={item.pictures[0].url} style={{ width: 100, height: 100, objectFit: "cover" }} />
+	                                                <img src={item.pictures[0].url} alt="cart-ig" style={{ width: 100, height: 100, objectFit: "cover" }} />
 	                                            </td>
 	                                            <td>Ksh {item.price}</td>
 	                                            <td>

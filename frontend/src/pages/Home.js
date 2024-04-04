@@ -8,7 +8,6 @@ import axiosInstance from '../axios';
 import { useDispatch, useSelector } from "react-redux";
 import { updateProducts } from "../features/productSlice";
 import ProductPreview from "../components/ProductPreview";
-import { Container } from "react-bootstrap";
 import "./Home.css";
 
 function Home() {
@@ -25,7 +24,7 @@ function Home() {
       <div className='home-banner'>Home</div>
       <div className='featured-products-container container mt-4'>
         <h2>Recent products</h2>
-        
+
         {/* last products from backend here*/}
         <div className="d-flex justify-content-center flex-wrap">
           {lastProducts.map((product) => (<ProductPreview {...product}/>) )}
@@ -52,7 +51,7 @@ function Home() {
                   {category.name}
                 </div>
               </Col>
-            </LinkContainer>   
+            </LinkContainer>
           ))}
         </Row>
       </div>
