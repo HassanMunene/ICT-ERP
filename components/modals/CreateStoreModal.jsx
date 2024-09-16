@@ -3,6 +3,9 @@
 import { z } from "zod"; // Zod is used to define validation rules for the form.
 import { zodResolver } from "@hookform/resolvers/zod"; // Integrates Zod with React Hook Form for validation.
 import { useForm } from "react-hook-form"; // React Hook Form manages form state and validation.
+import { useState } from "react";
+import axios from "axios";
+
 
 import { useCreateStoreModal } from "@/hooks/useCreateStoreModal"; // Custom hook to manage modal open/close state.
 import BaseModal from "./BaseModal"; // The reusable modal component to display the form.
@@ -16,6 +19,7 @@ import {
 } from "@/components/ui/form"; // Components for building accessible forms with React Hook Form.
 import { Input } from "@/components/ui/input"; // Input component for form fields.
 import { Button } from "../ui/button"; // Button component.
+import toast from "react-hot-toast";
 
 
 // Define form validation schema using Zod
@@ -27,6 +31,7 @@ const formSchema = z.object({
 const CreateStoreModal = () => {
     // Access the modal state (open/close) using the custom Zustand hook.
     const createStoreModal = useCreateStoreModal();
+    const [isLoading, setIsLoading] = useState(false);
 
     // Initialize the form using React Hook Form with Zod validation.
     const form = useForm({
@@ -39,7 +44,17 @@ const CreateStoreModal = () => {
     // Handler for form submission
     // This function is called when the form is successfully submitted.
     const onSubmit = async (values) => {
-        console.log(values); // Handle the form values (e.g., send them to a server).
+        try {
+            setIsLoading(true);
+            const response = await axios.post('/api/stores', values);
+            toast.success('store created');
+            console.log(response.data);
+        } catch (error) {
+            toast.error('something went wrong!');
+            console.log("[STORE AXIOS POST SECTION]", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -65,7 +80,11 @@ const CreateStoreModal = () => {
                                         <FormLabel>Name</FormLabel> {/* Label for the input field */}
                                         <FormControl>
                                             {/* Input field connected to the form using {...field} */}
-                                            <Input placeholder="E-commerce" {...field} />
+                                            <Input 
+                                                disabled={isLoading}
+                                                placeholder="E-commerce" 
+                                                {...field} 
+                                            />
                                         </FormControl>
                                         <FormMessage /> {/* Displays validation error message */}
                                     </FormItem>
@@ -73,12 +92,14 @@ const CreateStoreModal = () => {
                             />
                             {/* Buttons for submitting or canceling the form */}
                             <div className="flex items-center justify-end pt-6 space-x-2">
-                                {/* Cancel button that closes the modal */}
-                                <Button variant="outline" onClick={createStoreModal.onClose}>
+                                <Button 
+                                    disabled={isLoading}
+                                    variant="outline" 
+                                    onClick={createStoreModal.onClose}
+                                >
                                     Cancel
                                 </Button>
-                                {/* Submit button to submit the form */}
-                                <Button type="submit">
+                                <Button type="submit" disabled={isLoading}>
                                     Continue
                                 </Button>
                             </div>

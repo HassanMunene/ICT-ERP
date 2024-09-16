@@ -1,7 +1,7 @@
 'use client' // This ensures that the component is client-side only in Next.js.
 
 import { useEffect, useState } from "react";
-import CreateStoreModal from "@/components/modals/createStoreModal"; // Importing the CreateStoreModal component.
+import CreateStoreModal from "@/components/modals/CreateStoreModal"; // Importing the CreateStoreModal component.
 
 export const ModalsProvider = () => {
     // State to track if the component is mounted on the client.
