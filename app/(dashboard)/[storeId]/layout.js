@@ -1,33 +1,47 @@
-//this is the server component for the dashboard page
-//it retrieves the userId from clerk using auth() if we dont have user means you
-// have not logged in just tryna be sneaky so you are redirected to sign-in page
-// then fetches the store that has been created by currently logged in user
-// if there is no store then your redirected to home page to create a store
-
 import prismaClient from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-export default async function DashboardPageLayout({ children, params}) {
-    const { userId } = auth();
-    if (!userId) {
-        redirect('/sign-in');
-    }
+/**
+ * DashboardPageLayout: Protected server component for dashboard access
+ *
+ * This server component retrieves the user ID from Clerk using `auth()`.
+ * If the user is not authenticated, it redirects them to the sign-in page.
+ *
+ * It then fetches the store associated with the provided `storeId` and user ID
+ * from the Prisma database. If no store exists, it redirects the user to the
+ * home page to encourage store creation.
+ *
+ * @param {object} props - Component props
+ * @param {React.ReactNode} props.children - Content to be rendered within the layout
+ * @param {string} props.params.storeId - ID of the store to be accessed
+ * @returns {JSX.Element} The dashboard layout with the provided children
+ */
+export default async function DashboardPageLayout({ children, params }) {
+  const { userId } = auth();
 
-    const store = await prismaClient.store.findFirst({
-        where: {
-            id: params.storeId,
-            userId: userId,
-        }
-    });
-    if (!store) {
-        redirect('/');
-    }
+  // Authentication check: Redirect non-authenticated users
+  if (!userId) {
+    return redirect('/sign-in');
+  }
 
-    return (
-        <>
-            <div>This will be navbar here</div>
-            {children}
-        </>
-    )
-};
+  // Store data fetching using Prisma
+  const store = await prismaClient.store.findFirst({
+    where: {
+      id: params.storeId,
+      userId, // Use the retrieved userId for secure data access
+    },
+  });
+
+  // Redirect to home page if no store exists for the user
+  if (!store) {
+    return redirect('/');
+  }
+
+  return (
+    <>
+      <div>This will be navbar here</div>
+      {children}
+    </>
+  );
+}
