@@ -14,6 +14,6 @@ export default function Home() {
   }, [isOpen, onOpen]);
 
   return (
-    <div>DASHBOARD HELLO!</div>
+    <div></div>
   )
 }
