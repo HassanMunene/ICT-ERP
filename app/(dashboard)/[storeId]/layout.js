@@ -2,6 +2,7 @@ import prismaClient from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import mongoose from "mongoose";
+import Navbar from "@/components/navbar/Navbar";
 
 /**
  * DashboardPageLayout: Protected server component for dashboard access
@@ -46,7 +47,7 @@ export default async function DashboardPageLayout({ children, params }) {
 
   return (
     <>
-      <div>This will be navbar here</div>
+      <Navbar />
       {children}
     </>
   );
