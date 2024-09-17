@@ -1,6 +1,7 @@
 import prismaClient from "@/lib/prismadb";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import mongoose from "mongoose";
 
 /**
  * DashboardPageLayout: Protected server component for dashboard access
@@ -25,6 +26,11 @@ export default async function DashboardPageLayout({ children, params }) {
     return redirect('/sign-in');
   }
 
+  //validate that storedId provided is correct and follows objectId rules
+  if (!isValidObjectId(params.storeId)) {
+    return redirect('/');
+  }
+
   // Store data fetching using Prisma
   const store = await prismaClient.store.findFirst({
     where: {
@@ -44,4 +50,9 @@ export default async function DashboardPageLayout({ children, params }) {
       {children}
     </>
   );
+};
+
+// Helper function to validate ObjectIDs
+function isValidObjectId(id) {
+  return mongoose.Types.ObjectId.isValid(id);
 }
