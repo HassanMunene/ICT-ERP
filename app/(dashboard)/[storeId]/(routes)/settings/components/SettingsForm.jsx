@@ -4,13 +4,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import toast from "react-hot-toast";
+import { Trash } from "lucide-react";
+import axios from "axios";
+import { useParams, useRouter } from "next/navigation";
 
 import Heading from "@/components/common/Heading";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+
 
 const formSchema = z.object({
     name: z.string().min(2, {message: "store name must be atleast 2 characters"})
@@ -19,13 +23,24 @@ const formSchema = z.object({
 const SettingsForm = ({ initialData }) => {
     const [open, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const params = useParams();
+    const router = useRouter();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: initialData,
     });
-    const onSubmit = (data) => {
-        console.log(data);
+    const onSubmit = async (data) => {
+        try {
+            setIsLoading(true);
+            await axios.patch(`/api/stores/${params.storeId}`, data);
+            router.refresh();
+            toast.success("store updated.");
+        } catch(error) {
+            toast.error('something went wrong.')
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -36,6 +51,7 @@ const SettingsForm = ({ initialData }) => {
                     description="Manage store preferences"
                 />
                 <Button
+                    disabled={isLoading}
                     variant="destructive"
                     size="icon"
                     onClick={() => {}}
@@ -54,7 +70,11 @@ const SettingsForm = ({ initialData }) => {
                                 <FormItem>
                                     <FormLabel>Name</FormLabel>
                                     <FormControl>
-                                        <Input disabled={isLoading} placeholder="store name"/>
+                                        <Input 
+                                            disabled={isLoading} 
+                                            placeholder="store name"
+                                            {...field}
+                                        />
                                     </FormControl>
                                 </FormItem>
                             )}
