@@ -1,23 +1,66 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file, which defines the data model and database connection.
+// Learn more about it in the Prisma documentation: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// For performance improvements with serverless or edge functions, 
+// you can explore Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// The generator block specifies which client Prisma will generate for interacting with the database.
 generator client {
+  // Specifies that Prisma will generate the Prisma Client using JavaScript.
   provider = "prisma-client-js"
 }
 
+// The datasource block defines the database connection for Prisma.
 datasource db {
+  // Specifies MongoDB as the database provider.
   provider = "mongodb"
+
+  // The database connection URL is read from the environment variable "DATABASE_URL".
   url      = env("DATABASE_URL")
 }
 
-
+// Definition of the Store model, which represents a store entity in the database.
 model Store {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  userId String
+  // The unique identifier for each store, which is an auto-generated MongoDB ObjectId.
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  // The name of the store.
+  name      String
+
+  // Foreign key linking to the user who owns the store (represented as a String).
+  userId    String
+
+  // The timestamp when the store was created, automatically set to the current date and time.
   createdAt DateTime @default(now())
+
+  // The timestamp when the store was last updated, automatically updated on modification.
   updatedAt DateTime @updatedAt
+
+  // One-to-many relationship: a store can have multiple billboards.
+  billboards Billboard[]
+}
+
+// Definition of the Billboard model, which represents a billboard entity.
+model Billboard {
+  // The unique identifier for each billboard, which is an auto-generated MongoDB ObjectId.
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Foreign key linking to the store this billboard belongs to.
+  storeId   String
+
+  // A label or title for the billboard.
+  label     String
+
+  // The URL of the image displayed on the billboard.
+  imageUrl  String
+
+  // The timestamp when the billboard was created, automatically set to the current date and time.
+  createdAt DateTime @default(now())
+
+  // The timestamp when the billboard was last updated, automatically updated on modification.
+  updatedAt DateTime @updatedAt
+
+  // Many-to-one relationship: each billboard belongs to a store.
+  // If the related store is deleted, the billboard will be deleted as well (Cascade).
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
 }

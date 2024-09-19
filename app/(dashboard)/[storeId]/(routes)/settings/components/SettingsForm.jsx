@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import AlertModal from "@/components/modals/AlertModal";
 
 
 const formSchema = z.object({
@@ -21,7 +22,7 @@ const formSchema = z.object({
 })
 
 const SettingsForm = ({ initialData }) => {
-    const [open, setIsOpen] = useState(false);
+    const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const params = useParams();
     const router = useRouter();
@@ -30,6 +31,23 @@ const SettingsForm = ({ initialData }) => {
         resolver: zodResolver(formSchema),
         defaultValues: initialData,
     });
+
+    const onDelete = async () => {
+        try {
+            setIsLoading(true);
+            await axios.delete(`/api/stores/${params.storeId}`);
+            router.refresh();
+            router.push("/");
+            toast.success("Store deleted.");
+        } catch (error) {
+            console.log(error);
+            toast.error("Make sure you remove all products and categories in this store.");
+        } finally {
+            setIsLoading(false);
+            setOpen(false);
+        }
+    }
+
     const onSubmit = async (data) => {
         try {
             setIsLoading(true);
@@ -45,6 +63,12 @@ const SettingsForm = ({ initialData }) => {
 
     return (
         <>
+            <AlertModal
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                onConfirm={onDelete}
+                isLoading={isLoading}
+            />
             <div className="flex items-center justify-between">
                 <Heading 
                     title="Settings"
@@ -54,7 +78,7 @@ const SettingsForm = ({ initialData }) => {
                     disabled={isLoading}
                     variant="destructive"
                     size="icon"
-                    onClick={() => {}}
+                    onClick={() => setOpen(true)}
                 >
                     <Trash className="h-4 w-4" />
                 </Button>
