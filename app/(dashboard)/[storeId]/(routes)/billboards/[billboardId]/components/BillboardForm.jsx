@@ -73,6 +73,7 @@ const BillboardForm = ({ initialData = null }) => {
             }
 
             router.refresh(); // Refresh the page to reflect changes
+            router.push(`/${params.storeId}/billboards`);
             toast.success(toastMessage); // Show success notification
 
         } catch (error) {
