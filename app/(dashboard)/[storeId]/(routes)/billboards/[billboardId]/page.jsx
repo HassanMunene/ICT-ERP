@@ -1,5 +1,5 @@
 import prismaClient from "@/lib/prismadb"; // Import Prisma client for database interaction
-import BillboardForm from "../components/BillboardForm"; // Import the BillboardForm component for form handling
+import BillboardForm from "./components/BillboardForm";
 
 // Async component that handles the billboard page
 const BillboardPage = async ({ params }) => {

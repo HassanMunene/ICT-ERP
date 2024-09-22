@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
  * - onConfirm: Callback function to execute when the user confirms the action.
  * - isLoading: Indicates whether a loading operation is in progress (boolean).
  */
-const AlertModal = ({isOpen, onClose, onConfirm, isLoading}) => {
+const AlertModal = ({isOpen, onClose, onConfirm, isLoading, description="Delete store"}) => {
     /** Tracks whether the component has mounted to prevent premature rendering.*/
     const [isMounted, setIsMounted] = useState(false);
 
@@ -49,7 +49,7 @@ const AlertModal = ({isOpen, onClose, onConfirm, isLoading}) => {
                     variant="destructive"
                     onClick={onConfirm}
                 >
-                    Delete store
+                    {description}
                 </Button>
             </div>
         </BaseModal>
