@@ -20,6 +20,7 @@ import { Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 
 /**
@@ -58,26 +59,60 @@ const BillboardForm = ({ initialData = null }) => {
     });
 
     // Handle form submission
-    const onSubmit = async(data) => {
+    const onSubmit = async (data) => {
         try {
-           setIsLoading(true);
-           if(initialData) {
-            await axios.patch(`/api/${params.storeId}/billboards/${}`)
-           } 
+            setIsLoading(true); // Set loading state to true while processing the request
+
+            // Check if there's initial data (i.e., editing an existing billboard)
+            if (initialData) {
+                // If editing, send a PATCH request to update the existing billboard
+                await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, data);
+            } else {
+                // If creating a new billboard, send a POST request to create it
+                await axios.post(`/api/${params.storeId}/billboards`, data);
+            }
+
+            router.refresh(); // Refresh the page to reflect changes
+            toast.success(toastMessage); // Show success notification
+
         } catch (error) {
-            
+            console.log('[ERROR SUBMITTING BILLBOARD FORM DATA]', error); // Log any error that occurs during submission
+            toast.error('Something went wrong.'); // Show error notification
+
+        } finally {
+            setIsLoading(false); // Always reset the loading state, whether successful or not
         }
-    }
+    };
+
 
     // Handle billboard deletion
-    const onDelete = () => {
-        console.log('deleted');
-    }
+    const onDelete = async () => {
+        try {
+            setIsLoading(true); // Set loading state to true to disable actions while processing
+            
+            // Send a DELETE request to remove the billboard based on the storeId and billboardId
+            await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`);
+            
+            router.refresh(); // Refresh the current page to reflect the changes
+            router.push('/'); // Navigate to dashboard homepage after deletion
+            toast.success("Billboard deleted"); // Show success notification to the user
+
+        } catch (error) {
+            console.log('[ERROR DELETING BILLBOARD]', error); // Log error details in the console
+
+            // Display an error message with instructions if there is a problem
+            toast.error('Make sure you remove all categories using this billboard first.');
+        } finally {
+            setIsLoading(false); // Reset loading state after the request is complete
+            setOpen(false); // Close the deletion confirmation modal
+        }
+    };
+
 
     // Dynamic content based on whether initial data exists (edit vs. create)
     const title = initialData ? "Edit billboard" : "Create a new billboard";
     const description = initialData ? "Edit a billboard" : "Add a new billboard";
-    const toastMessage = initialData ? "Billboard updated" : "Billboard created";
+    const toastMessage = initialData ? "Billboard updated." : "Billboard created.";
     const action = initialData ? "Save changes" : "Create";
 
     return (
