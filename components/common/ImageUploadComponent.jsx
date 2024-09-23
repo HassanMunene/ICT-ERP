@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button"; // Importing the Button component for UI
 import { ImagePlus, Trash } from "lucide-react"; // Icons for upload and delete
@@ -13,6 +15,7 @@ const ImageUploadComponent = ({ disabled, onChange, onRemoveImage, value }) => {
 
     // Handles successful image upload by Cloudinary
     const onUploadImage = (result) => {
+        console.log("handle uplaod");
         onChange(result.info.secure_url); // Pass the uploaded image's URL to the parent component
     };
 
@@ -49,7 +52,7 @@ const ImageUploadComponent = ({ disabled, onChange, onRemoveImage, value }) => {
                 ))}
             </div>
             {/* Cloudinary upload widget */}
-            <CldUploadWidget upload={onUploadImage} uploadPreset="kzc0wg3y">
+            <CldUploadWidget onUpload={onUploadImage} uploadPreset="kzc0wg3y">
                 {({ open }) => {
                     const onClick = () => {
                         open(); // Open the Cloudinary widget when button is clicked

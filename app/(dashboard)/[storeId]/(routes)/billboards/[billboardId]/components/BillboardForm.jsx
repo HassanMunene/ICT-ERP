@@ -66,10 +66,10 @@ const BillboardForm = ({ initialData = null }) => {
             // Check if there's initial data (i.e., editing an existing billboard)
             if (initialData) {
                 // If editing, send a PATCH request to update the existing billboard
-                await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, data);
+                await axios.patch(`/api/stores/${params.storeId}/billboards/${params.billboardId}`, data);
             } else {
                 // If creating a new billboard, send a POST request to create it
-                await axios.post(`/api/${params.storeId}/billboards`, data);
+                await axios.post(`/api/stores/${params.storeId}/billboards`, data);
             }
 
             router.refresh(); // Refresh the page to reflect changes
