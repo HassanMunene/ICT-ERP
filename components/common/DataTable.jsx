@@ -1,20 +1,41 @@
 'use client';
 
-import { flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
+import { 
+    flexRender, 
+    getCoreRowModel, 
+    getFilteredRowModel, 
+    getPaginationRowModel, 
+    useReactTable 
+} from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Button } from "../ui/button";
+import { useState } from "react";
+import { Input } from "../ui/input";
 
-export function DataTable({ columns, data }) {
+export function DataTable({ searchKey, columns, data }) {
+    const [columnFilters, setColumnFilters] = useState([]);
+
     const table = useReactTable({
         data: data,
         columns: columns,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        onColumnFiltersChange: setColumnFilters,
+        getFilteredRowModel: getFilteredRowModel(),
+        state: { columnFilters, },
     });
 
     //console.log(table);
     return (
         <div>
+            <div className="flex items-center py-4">
+                <Input 
+                    placeholder="Search..."
+                    value={(table.getColumn(searchKey)?.getFilterValue()) ?? ""}
+                    onChange={(event) => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
+                    className="max-w-sm"
+                />
+            </div>
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
