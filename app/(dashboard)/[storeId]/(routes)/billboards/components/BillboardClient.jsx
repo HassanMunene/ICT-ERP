@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator"; // Importing a Separator 
 import { Plus } from "lucide-react"; // Importing the Plus icon from the lucide-react icon library
 import { useParams, useRouter } from "next/navigation"; // Importing hooks to access router and URL parameters in Next.js
 import { columns } from "./BillboardColumns";
+import ApiRoutesListSection from "@/components/common/ApiRoutesListSection";
 
 const BillboardClient = ({ data }) => {
     const router = useRouter(); // Getting the router object to navigate programmatically
@@ -31,6 +32,9 @@ const BillboardClient = ({ data }) => {
             {/* Separator for a visual break between sections */}
             <Separator />
             <DataTable searchKey="label" columns={columns} data={data} />
+            <Separator />
+            <Heading title="Billboard APIs" description="Api calls for Billboards"/>
+            <ApiRoutesListSection entityName="billboard" entityId="billboardId"/>
         </>
     );
 }
