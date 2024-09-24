@@ -60,15 +60,14 @@ const ApiAlertBox = ({ title, description, variant = "public" }) => {
             <AlertDescription className="mt-4 flex items-center justify-between">
                 <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                     {description} {/* API route displayed in a styled code block */}
-                    <Button 
+                </code>
+                <Button 
                         variant="outline"
                         size="icon"
                         onClick={() => onCopyApiRoute(description)} // Copy the API route when button is clicked
-                        className="ml-2"
                     >
                         <Copy className="h-4 w-4"/> {/* Copy Icon */}
-                    </Button>
-                </code>
+                </Button>
             </AlertDescription>
         </Alert>
     )

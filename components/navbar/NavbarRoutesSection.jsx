@@ -26,6 +26,11 @@ const NavbarRoutesSection = ({ className }) => {
             active: pathname === `/${params.storeId}/billboards`, // Set `active` if the current path matches this route.
         },
         {
+            href: `/${params.storeId}/categories`, // Dynamic URL for categories page.
+            label: 'Categories', // The label shown in the navbar.
+            active: pathname === `/${params.storeId}/categories`, // Set `active` if the current path matches this route.
+        },
+        {
             href: `/${params.storeId}/settings`, // Dynamic URL for the settings page.
             label: 'Settings', // The label shown in the navbar.
             active: pathname === `/${params.storeId}/settings`, // Set `active` if the current path matches this route.

@@ -38,6 +38,9 @@ model Store {
 
   // One-to-many relationship: a store can have multiple billboards.
   billboards Billboard[]
+
+  // One-to-many relationship: a store can have multiple categories.
+  categories Category[]
 }
 
 // Definition of the Billboard model, which represents a billboard entity.
@@ -46,7 +49,7 @@ model Billboard {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
 
   // Foreign key linking to the store this billboard belongs to.
-  storeId   String
+  storeId   String   @db.ObjectId
 
   // A label or title for the billboard.
   label     String
@@ -60,7 +63,38 @@ model Billboard {
   // The timestamp when the billboard was last updated, automatically updated on modification.
   updatedAt DateTime @updatedAt
 
+  // One-to-many relationship: a billboard can have multiple categories.
+  categories Category[]
+
   // Many-to-one relationship: each billboard belongs to a store.
   // If the related store is deleted, the billboard will be deleted as well (Cascade).
   store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  // The unique identifier for each category, which is an auto-generated MongoDB ObjectId.
+  id String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  // foreign key linking category to the store it belongs to
+  storeId String   @db.ObjectId
+
+  // foreing key linking category to the billboard it belongs to
+  billboardId String @db.ObjectId
+
+  // the name of the category
+  name String
+
+  // The timestamp when category was created, automatically set to the current date and time.
+  createdAt DateTime @default(now())
+
+  // The timestamp when category was last updated, automatically updated on modification.
+  updatedAt DateTime @updatedAt
+
+  // Many-to-one relationship: each category belongs to a store.
+  // If the related store is deleted, the category will be deleted as well (Cascade).
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  // Many-to-one relationship: each category belongs to a billboard.
+  // If the related billboard is deleted, the category will be deleted as well (Cascade).
+  billboard Billboard @relation(fields: [billboardId], references: [id], onDelete: Cascade)
 }
