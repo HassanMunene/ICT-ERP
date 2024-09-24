@@ -95,7 +95,7 @@ const BillboardForm = ({ initialData = null }) => {
             await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`);
             
             router.refresh(); // Refresh the current page to reflect the changes
-            router.push('/'); // Navigate to dashboard homepage after deletion
+            router.push(`/${params.storeId}/billboards`); // Navigate to billboards page after deletion
             toast.success("Billboard deleted"); // Show success notification to the user
 
         } catch (error) {

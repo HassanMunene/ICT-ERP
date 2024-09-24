@@ -18,7 +18,7 @@ const BillboardClient = ({ data }) => {
             <div className="flex items-center justify-between">
                 {/* Heading for the billboards page, showing total count (currently 0) */}
                 <Heading 
-                    title="Billboard (0)"
+                    title={"Billboards " + data.length}
                     description="Manage billboards for your store"
                 />
                 {/* Button to add a new billboard, redirects to a new billboard creation page */}
@@ -30,7 +30,7 @@ const BillboardClient = ({ data }) => {
             </div>
             {/* Separator for a visual break between sections */}
             <Separator />
-            <DataTable columns={columns} data={data} />
+            <DataTable searchKey="label" columns={columns} data={data} />
         </>
     );
 }

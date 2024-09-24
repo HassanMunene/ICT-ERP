@@ -2,10 +2,6 @@ import prismaClient from "@/lib/prismadb"; // Import Prisma client for database 
 import { auth } from "@clerk/nextjs/server"; // Import Clerk's server-side authentication
 import { NextResponse } from "next/server"; // Import Next.js's response helper
 
-
-import prismaClient from "@/lib/prismadb"; // Import Prisma client for database interaction
-import { NextResponse } from "next/server"; // Import Next.js's response helper
-
 // Handle the GET request to fetch a specific billboard by its ID
 export async function GET(request, { params }) {
     try {
@@ -88,10 +84,6 @@ export async function PATCH(request, { params }) {
         return new NextResponse("Internal server error", { status: 500 }); // Return 500 if there's a server error
     }
 };
-
-import prismaClient from "@/lib/prismadb"; // Import Prisma client for database interaction
-import { auth } from "@clerk/nextjs/server"; // Import Clerk's server-side authentication
-import { NextResponse } from "next/server"; // Import Next.js's response helper
 
 // Handle the DELETE request to remove a billboard
 export async function DELETE(request, { params }) {
