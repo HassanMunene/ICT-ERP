@@ -83,8 +83,8 @@ const SidebarItemComponent = memo(({
                 to={item.href}
                 onClick={handleClick}
                 className={cn(
-                    'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                    'flex items-center justify-between rounded-sm px-3 py-2 text-sm font-medium transition-colors',
+                    'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2',
                     isActive || hasActiveChild
                         ? 'bg-accent text-accent-foreground'
                         : 'text-muted-foreground',
