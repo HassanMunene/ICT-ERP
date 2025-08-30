@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import {
     LayoutDashboard, Users, Briefcase, DollarSign, FileText, Target,
     FolderOpen, Shield, Building2, Calendar, Clock, ChevronDown, ChevronUp,
-    Settings, LogOut, User, Search, Menu, X
+    Settings, LogOut, User, Search, X
 } from 'lucide-react';
 
 // Types
@@ -22,9 +22,11 @@ interface SidebarItem {
 
 interface SidebarProps {
     className?: string;
-    isCollapsed?: boolean;
-    onToggleCollapse?: () => void;
+    isCollapsed: boolean;
+    onToggleCollapse: () => void;
     userPermissions?: string[];
+    isMobileOpen?: boolean;
+    onMobileToggle?: () => void;
 }
 
 interface SidebarItemProps {
@@ -36,9 +38,10 @@ interface SidebarItemProps {
     onToggleExpand: (itemId: string) => void;
     userPermissions?: string[];
     depth?: number;
+    isCollapsed?: boolean;
 }
 
-// Memoized sidebar item component to prevent unnecessary re-renders
+// Memoized sidebar item component
 const SidebarItemComponent = memo(({
     item,
     isActive,
@@ -47,7 +50,8 @@ const SidebarItemComponent = memo(({
     onItemClick,
     onToggleExpand,
     userPermissions = [],
-    depth = 0
+    depth = 0,
+    isCollapsed = false
 }: SidebarItemProps) => {
     const location = useLocation();
     const hasChildren = item.children && item.children.length > 0;
@@ -58,6 +62,8 @@ const SidebarItemComponent = memo(({
 
     // Handle section headers differently
     if (item.isSectionHeader) {
+        if (isCollapsed) return null; // Hide section headers when collapsed
+
         return (
             <div className={cn(
                 "px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
@@ -77,49 +83,76 @@ const SidebarItemComponent = memo(({
         }
     };
 
-    return (
-        <div>
-            <Link
-                to={item.href}
-                onClick={handleClick}
-                className={cn(
-                    'flex items-center justify-between rounded-sm px-3 py-2 text-sm font-medium transition-colors',
-                    'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:ring-offset-2',
-                    isActive || hasActiveChild
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground',
-                    depth > 0 && 'ml-2 py-1.5 text-xs'
-                )}
-                aria-current={isActive ? 'page' : undefined}
-            >
-                <div className="flex items-center space-x-3 overflow-hidden">
-                    <item.icon className={cn("h-4 w-4 flex-shrink-0", depth > 0 && "h-3.5 w-3.5")} />
-                    <span className="truncate">{item.title}</span>
-                </div>
+    // Tooltip for collapsed state
+    const TooltipWrapper = ({ children }: { children: React.ReactElement }) => {
+        if (!isCollapsed) return children;
 
-                <div className="flex items-center space-x-1">
-                    {item.badge !== undefined && item.badge !== '' && (
-                        <Badge
-                            variant={isActive ? "default" : "secondary"}
-                            className="h-5 min-w-[20px] text-xs flex items-center justify-center"
-                        >
+        return (
+            <div className="relative group">
+                {children}
+                <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 
+                      bg-primary text-primary-foreground text-xs rounded-md shadow-md 
+                      opacity-0 group-hover:opacity-100 transition-opacity z-[60] 
+                      whitespace-nowrap pointer-events-none">
+                    {item.title}
+                    {item.badge && (
+                        <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
                             {item.badge}
                         </Badge>
                     )}
+                </div>
+            </div>
+        );
+    };
 
-                    {hasChildren && (
-                        <div className="ml-1">
-                            {isExpanded ? (
-                                <ChevronUp className="h-4 w-4" />
-                            ) : (
-                                <ChevronDown className="h-4 w-4" />
+    return (
+        <div>
+            <TooltipWrapper>
+                <Link
+                    to={item.href}
+                    onClick={handleClick}
+                    className={cn(
+                        'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                        'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                        isActive || hasActiveChild
+                            ? 'bg-accent text-accent-foreground'
+                            : 'text-muted-foreground',
+                        depth > 0 && 'ml-2 py-1.5 text-xs',
+                        isCollapsed && 'justify-center px-2'
+                    )}
+                    aria-current={isActive ? 'page' : undefined}
+                >
+                    <div className={cn("flex items-center space-x-3 overflow-hidden", isCollapsed && "space-x-0")}>
+                        <item.icon className={cn("h-4 w-4 flex-shrink-0", depth > 0 && "h-3.5 w-3.5")} />
+                        {!isCollapsed && <span className="truncate">{item.title}</span>}
+                    </div>
+
+                    {!isCollapsed && (
+                        <div className="flex items-center space-x-1">
+                            {item.badge !== undefined && item.badge !== '' && (
+                                <Badge
+                                    variant={isActive ? "default" : "secondary"}
+                                    className="h-5 min-w-[20px] text-xs flex items-center justify-center"
+                                >
+                                    {item.badge}
+                                </Badge>
+                            )}
+
+                            {hasChildren && (
+                                <div className="ml-1">
+                                    {isExpanded ? (
+                                        <ChevronUp className="h-4 w-4" />
+                                    ) : (
+                                        <ChevronDown className="h-4 w-4" />
+                                    )}
+                                </div>
                             )}
                         </div>
                     )}
-                </div>
-            </Link>
+                </Link>
+            </TooltipWrapper>
 
-            {hasChildren && isExpanded && (
+            {hasChildren && isExpanded && !isCollapsed && (
                 <div className={cn("mt-1 space-y-1", depth > 0 ? 'ml-4' : 'ml-6 border-l pl-4')}>
                     {item.children!.map((child) => (
                         <SidebarItemComponent
@@ -132,6 +165,7 @@ const SidebarItemComponent = memo(({
                             onToggleExpand={onToggleExpand}
                             userPermissions={userPermissions}
                             depth={depth + 1}
+                            isCollapsed={isCollapsed}
                         />
                     ))}
                 </div>
@@ -143,7 +177,13 @@ const SidebarItemComponent = memo(({
 SidebarItemComponent.displayName = 'SidebarItemComponent';
 
 // Main sidebar component
-export function Sidebar({ className, isCollapsed = false, onToggleCollapse, userPermissions = [] }: SidebarProps) {
+export function Sidebar({
+    className,
+    isCollapsed,
+    userPermissions = [],
+    isMobileOpen = false,
+    onMobileToggle
+}: SidebarProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -278,7 +318,7 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
 
     // Filter items based on search term
     const filteredItems = useMemo(() => {
-        if (!searchTerm) return sidebarItems;
+        if (!searchTerm || isCollapsed) return sidebarItems;
 
         const searchLower = searchTerm.toLowerCase();
         return sidebarItems.filter(item => {
@@ -295,7 +335,7 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
 
             return matches;
         });
-    }, [sidebarItems, searchTerm]);
+    }, [sidebarItems, searchTerm, isCollapsed]);
 
     // Check if an item has an active child
     const hasActiveChild = useCallback((item: SidebarItem): boolean => {
@@ -311,10 +351,10 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
     const handleItemClick = useCallback((item: SidebarItem) => {
         navigate(item.href);
         // Auto-collapse sidebar on mobile after selection
-        if (window.innerWidth < 768 && onToggleCollapse) {
-            onToggleCollapse();
+        if (window.innerWidth < 768 && onMobileToggle) {
+            onMobileToggle();
         }
-    }, [navigate, onToggleCollapse]);
+    }, [navigate, onMobileToggle]);
 
     // Toggle expanded state for items with children
     const handleToggleExpand = useCallback((itemId: string) => {
@@ -331,6 +371,8 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
 
     // Auto-expand parent when child is active
     useEffect(() => {
+        if (isCollapsed) return; // Don't auto-expand when collapsed
+
         const findParentWithActiveChild = (items: SidebarItem[]): string | null => {
             for (const item of items) {
                 if (item.children && item.children.some(child =>
@@ -351,40 +393,80 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
         if (parentId) {
             setExpandedItems(prev => new Set(prev).add(parentId));
         }
-    }, [location.pathname, sidebarItems, hasActiveChild]);
+    }, [location.pathname, sidebarItems, hasActiveChild, isCollapsed]);
+
+    // Close sidebar when clicking outside on mobile
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const sidebar = document.querySelector('[data-sidebar]');
+            const trigger = document.querySelector('[data-sidebar-trigger]');
+
+            if (isMobileOpen &&
+                sidebar &&
+                !sidebar.contains(event.target as Node) &&
+                trigger &&
+                !trigger.contains(event.target as Node)) {
+                onMobileToggle?.();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isMobileOpen, onMobileToggle]);
+
+    // Prevent body scroll when mobile sidebar is open
+    useEffect(() => {
+        if (isMobileOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isMobileOpen]);
 
     return (
         <>
             {/* Mobile overlay */}
-            {!isCollapsed && (
+            {isMobileOpen && (
                 <div
                     className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
-                    onClick={onToggleCollapse}
+                    onClick={onMobileToggle}
                 />
             )}
 
             <aside
+                data-sidebar
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 flex h-full w-64 flex-col border-r bg-background transition-transform duration-300 ease-in-out',
-                    'md:relative md:translate-x-0',
-                    isCollapsed && '-translate-x-full',
+                    'fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r bg-background transition-all duration-300 ease-in-out',
+                    'md:relative',
+                    isCollapsed ? 'w-16' : 'w-64',
+                    isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
                     className
                 )}
             >
                 {/* Header with logo and collapse button */}
-                <div className="flex h-16 items-center justify-between border-b px-4">
-                    <div className="flex items-center space-x-2">
+                <div className={cn("flex h-16 items-center border-b px-4", isCollapsed ? "justify-center" : "justify-between")}>
+                    {!isCollapsed ? (
+                        <div className="flex items-center space-x-2">
+                            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                                <span className="text-white font-bold text-sm">S</span>
+                            </div>
+                            <div>
+                                <h1 className="text-lg font-semibold">ServiceERP</h1>
+                                <p className="text-xs text-muted-foreground">Multi-Service Firm</p>
+                            </div>
+                        </div>
+                    ) : (
                         <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                             <span className="text-white font-bold text-sm">S</span>
                         </div>
-                        <div>
-                            <h1 className="text-lg font-semibold">ServiceERP</h1>
-                            <p className="text-xs text-muted-foreground">Multi-Service Firm</p>
-                        </div>
-                    </div>
+                    )}
 
                     <button
-                        onClick={onToggleCollapse}
+                        onClick={onMobileToggle}
                         className="rounded-md p-1.5 hover:bg-accent md:hidden"
                         aria-label="Close sidebar"
                     >
@@ -392,19 +474,21 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
                     </button>
                 </div>
 
-                {/* Search bar */}
-                <div className="border-b p-4">
-                    <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <input
-                            type="text"
-                            placeholder="Search navigation..."
-                            className="w-full rounded-lg border pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                {/* Search bar - hidden when collapsed */}
+                {!isCollapsed && (
+                    <div className="border-b p-4">
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Search navigation..."
+                                className="w-full rounded-lg border pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Navigation items */}
                 <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4">
@@ -419,6 +503,7 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
                                 onItemClick={handleItemClick}
                                 onToggleExpand={handleToggleExpand}
                                 userPermissions={userPermissions}
+                                isCollapsed={isCollapsed}
                             />
                         ))}
                     </div>
@@ -426,39 +511,30 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
 
                 {/* User footer */}
                 <div className="border-t p-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
+                    <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
+                        <div className={cn("flex items-center", isCollapsed ? "space-x-0" : "space-x-3")}>
                             <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
                                 <User className="h-4 w-4" />
                             </div>
-                            <div className="flex-1 overflow-hidden">
-                                <p className="text-sm font-medium truncate">Admin User</p>
-                                <p className="text-xs text-muted-foreground truncate">admin@company.com</p>
-                            </div>
+                            {!isCollapsed && (
+                                <div className="flex-1 overflow-hidden">
+                                    <p className="text-sm font-medium truncate">Admin User</p>
+                                    <p className="text-xs text-muted-foreground truncate">admin@company.com</p>
+                                </div>
+                            )}
                         </div>
 
-                        <button
-                            className="rounded-md p-1.5 hover:bg-accent"
-                            aria-label="Logout"
-                        >
-                            <LogOut className="h-4 w-4" />
-                        </button>
+                        {!isCollapsed && (
+                            <button
+                                className="rounded-md p-1.5 hover:bg-accent"
+                                aria-label="Logout"
+                            >
+                                <LogOut className="h-4 w-4" />
+                            </button>
+                        )}
                     </div>
                 </div>
             </aside>
         </>
-    );
-}
-
-// Mobile menu trigger component
-export function SidebarTrigger({ onClick }: { onClick: () => void }) {
-    return (
-        <button
-            onClick={onClick}
-            className="rounded-md p-2 hover:bg-accent md:hidden"
-            aria-label="Open sidebar"
-        >
-            <Menu className="h-5 w-5" />
-        </button>
     );
 }
