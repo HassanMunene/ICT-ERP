@@ -1,27 +1,11 @@
-import React, { useState, useMemo, memo, useCallback } from 'react';
+import React, { useState, useMemo, memo, useCallback, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import {
-    LayoutDashboard,
-    Users,
-    Briefcase,
-    DollarSign,
-    FileText,
-    Target,
-    FolderOpen,
-    Shield,
-    Building2,
-    Calendar,
-    Clock,
-    ChevronDown,
-    ChevronUp,
-    Settings,
-    LogOut,
-    User,
-    Search,
-    Menu,
-    X
+    LayoutDashboard, Users, Briefcase, DollarSign, FileText, Target,
+    FolderOpen, Shield, Building2, Calendar, Clock, ChevronDown, ChevronUp,
+    Settings, LogOut, User, Search, Menu, X
 } from 'lucide-react';
 
 // Types
@@ -346,7 +330,7 @@ export function Sidebar({ className, isCollapsed = false, onToggleCollapse, user
     }, []);
 
     // Auto-expand parent when child is active
-    React.useEffect(() => {
+    useEffect(() => {
         const findParentWithActiveChild = (items: SidebarItem[]): string | null => {
             for (const item of items) {
                 if (item.children && item.children.some(child =>
