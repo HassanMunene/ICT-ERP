@@ -1,6 +1,7 @@
 import './App.css'
 
 import ClientBody from './components/ClientBody';
+import { Sidebar } from './components/layout/Sidebar';
 
 function App() {
   return (

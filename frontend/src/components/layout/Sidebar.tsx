@@ -1,7 +1,4 @@
-'use client';
-
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -113,7 +110,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className }: SidebarProps) {
-    const pathname = usePathname();
+    const location = useLocation();
+    const pathname = location?.pathname
 
     return (
         <div className={cn('flex h-full w-64 flex-col bg-white border-r', className)}>
@@ -131,7 +129,7 @@ export function Sidebar({ className }: SidebarProps) {
                 {sidebarItems.map((item) => (
                     <div key={item.href}>
                         <Link
-                            href={item.href}
+                            to={item.href}
                             className={cn(
                                 'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground',
                                 pathname === item.href
@@ -158,7 +156,7 @@ export function Sidebar({ className }: SidebarProps) {
                                 {item.children.map((child) => (
                                     <Link
                                         key={child.href}
-                                        href={child.href}
+                                        to={child.href}
                                         className={cn(
                                             'flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
                                             pathname === child.href
