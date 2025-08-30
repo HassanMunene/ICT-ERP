@@ -5,6 +5,10 @@ import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <html lang="en">
+      <body suppressHydrationWarning className="antialiased">
+        <App />
+      </body>
+    </html>
   </StrictMode>,
 )
