@@ -1,36 +1,88 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 
 import './App.css'
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
-import MainDashboard from './pages/MainDashboard';
 import { ThemeProvider } from "./lib/theme-provider";
 import { useSidebar } from "./components/hooks/useSidebar";
-import { Plus, Download, Users, Settings, FileText, Building } from "lucide-react";
+import { Plus, Download, Users } from "lucide-react";
+import { PageLoading, ContentSkeleton, AppLoading } from "./components/layout/Loading";
 import { cn } from "./lib/utils";
 
-// Mock pages for demonstration
-const HRPage = () => <div className="p-6">Human Resources Dashboard</div>;
-const ProjectsPage = () => <div className="p-6">Projects Dashboard</div>;
-const CRMPage = () => <div className="p-6">CRM Dashboard</div>;
-const FinancePage = () => <div className="p-6">Finance Dashboard</div>;
-const AdminPage = () => <div className="p-6">Admin Dashboard</div>;
+// Lazy load pages for better performance
+const MainDashboard = lazy(() => import('./pages/MainDashboard'));
+const HRPage = lazy(() => import('./pages/HRPage'));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const CRMPage = lazy(() => import('./pages/CRMPage'));
+const FinancePage = lazy(() => import('./pages/FinancePage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 
-// Error Boundary Component (simplified)
-const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
-  return <>{children}</>;
-};
+// Error Boundary Component
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-// Loading Component
-const AppLoading = () => (
-  <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-  </div>
-);
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('App Error:', error, errorInfo);
+    // Log to error reporting service
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+            <button
+              className="px-4 py-2 bg-primary text-primary-foreground rounded"
+              onClick={() => window.location.reload()}
+            >
+              Reload Application
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function App() {
   const { isCollapsed, isMobileOpen, toggleCollapse, toggleMobile } = useSidebar();
+  const [isAppLoading, setIsAppLoading] = useState(true);
+  const [navigationState, setNavigationState] = useState<'idle' | 'navigating'>('idle');
+
+  // Simulate Application Loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAppLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle navigation events for loading states.
+  useEffect(() => {
+    const handleStart = () => setNavigationState('navigating');
+    const handleComplete = () => setNavigationState('idle');
+
+    // Listen to navigation events (you might need to adapt this based on your routing)
+    window.addEventListener('beforeunload', handleStart);
+    window.addEventListener('load', handleComplete);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleStart);
+      window.removeEventListener('load', handleComplete);
+    };
+  }, [])
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -102,6 +154,10 @@ function App() {
     { label: 'Dashboard' }
   ];
 
+  if (isAppLoading) {
+    return <AppLoading />;
+  }
+
   return (
     <ErrorBoundary>
       <Router>
@@ -136,24 +192,52 @@ function App() {
               />
 
               <main className="flex-1 overflow-auto p-6 bg-muted/20">
-                <Routes>
-                  <Route path="/" element={<MainDashboard />} />
-                  <Route path="/hr/*" element={<HRPage />} />
-                  <Route path="/projects/*" element={<ProjectsPage />} />
-                  <Route path="/crm/*" element={<CRMPage />} />
-                  <Route path="/finance/*" element={<FinancePage />} />
-                  <Route path="/admin/*" element={<AdminPage />} />
+                {/* Global navigation loading indicator */}
+                {navigationState === 'navigating' && (
+                  <div className="fixed top-16 left-0 right-0 h-1 z-50">
+                    <div className="h-full bg-primary animate-pulse"></div>
+                  </div>
+                )}
+                <Suspense fallback={<PageLoading />}>
+                  <Routes>
+                    <Route path="/" element={<MainDashboard />} />
+                    <Route path="/hr/*" element={
+                      <Suspense fallback={<ContentSkeleton />}>
+                        <HRPage />
+                      </Suspense>
+                    } />
+                    <Route path="/projects/*" element={
+                      <Suspense fallback={<ContentSkeleton />}>
+                        <ProjectsPage />
+                      </Suspense>
+                    } />
+                    <Route path="/crm/*" element={
+                      <Suspense fallback={<ContentSkeleton />}>
+                        <CRMPage />
+                      </Suspense>
+                    } />
+                    <Route path="/finance/*" element={
+                      <Suspense fallback={<ContentSkeleton />}>
+                        <FinancePage />
+                      </Suspense>
+                    } />
+                    <Route path="/admin/*" element={
+                      <Suspense fallback={<ContentSkeleton />}>
+                        <AdminPage />
+                      </Suspense>
+                    } />
 
-                  {/* 404 Page */}
-                  <Route path="*" element={
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <h1 className="text-4xl font-bold mb-4">404</h1>
-                        <p className="text-muted-foreground">Page not found</p>
+                    {/* 404 Page */}
+                    <Route path="*" element={
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <h1 className="text-4xl font-bold mb-4">404</h1>
+                          <p className="text-muted-foreground">Page not found</p>
+                        </div>
                       </div>
-                    </div>
-                  } />
-                </Routes>
+                    } />
+                  </Routes>
+                </Suspense>
               </main>
             </div>
           </div>

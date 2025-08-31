@@ -7,7 +7,8 @@ import {
     FolderOpen, Shield, Building2, Calendar, Clock, ChevronDown, ChevronUp,
     Settings, LogOut, User, Search, X
 } from 'lucide-react';
-import { Tooltip } from '../ui/Tooltip';
+import { Tooltip } from './Tooltip';
+
 
 // Types
 interface SidebarItem {
@@ -89,23 +90,25 @@ const SidebarItemComponent = memo(({
         if (!isCollapsed) return children;
 
         return (
-            <Tooltip content={
-                <div className="flex items-center">
-                    {item.title}
-                    {item.badge && (
-                        <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                            {item.badge}
-                        </Badge>
-                    )}
-                </div>
-            }>
-                {children}
-            </Tooltip>
+            <div >
+                <Tooltip content={
+                    <div className="flex items-center">
+                        {item.title}
+                        {item.badge && (
+                            <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                                {item.badge}
+                            </Badge>
+                        )}
+                    </div>
+                }>
+                    {children}
+                </Tooltip>
+            </div>
         );
     };
 
     return (
-        <div>
+        <div className='relative'>
             <TooltipWrapper>
                 <Link
                     to={item.href}

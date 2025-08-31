@@ -38,7 +38,7 @@ export function Tooltip({ content, children, disabled = false }: TooltipProps) {
             {isVisible &&
                 createPortal(
                     <div
-                        className="fixed px-3 py-2 bg-primary text-primary-foreground text-sm rounded-md shadow-lg z-[9999] whitespace-nowrap pointer-events-none"
+                        className="absolute px-3 py-2 bg-primary text-primary-foreground text-sm rounded-md shadow-lg z-[9999] whitespace-nowrap pointer-events-none"
                         style={{
                             top: `${position.top}px`,
                             left: `${position.left}px`,
