@@ -7,21 +7,10 @@ export function useSidebar() {
 
     const toggleCollapse = useCallback(() => {
         setIsCollapsed(prev => !prev);
-        // Save to localStorage
-        localStorage.setItem('sidebarCollapsed', JSON.stringify(!isCollapsed));
-
     }, []);
 
     const toggleMobile = useCallback(() => {
         setIsMobileOpen(prev => !prev);
-    }, []);
-
-    // Load saved state from localStorage
-    useEffect(() => {
-        const savedState = localStorage.getItem('sidebarCollapsed');
-        if (savedState) {
-            setIsCollapsed(JSON.parse(savedState));
-        }
     }, []);
 
     // Close mobile sidebar when window is resized to desktop size
