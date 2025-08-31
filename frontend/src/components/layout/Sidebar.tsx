@@ -468,7 +468,7 @@ export function Sidebar({
         if (isTemporarilyExpanded) {
             const timer = setTimeout(() => {
                 setIsTemporarilyExpanded(false);
-            }, 5000); // Collapse after 5 seconds of inactivity
+            }, 10000); // Collapse after 10 seconds of inactivity
 
             return () => clearTimeout(timer);
         }

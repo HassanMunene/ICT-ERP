@@ -14,7 +14,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/lib/theme-provider';
-import { HeaderSkeleton } from '../ui/HeaderSkeleton';
 
 type Notification = {
     id: string;
@@ -123,7 +122,7 @@ const NotificationItem = memo(({ notification, onMarkAsRead }: {
 NotificationItem.displayName = 'NotificationItem';
 
 // User status indicator
-const UserStatus = ({ status }: { status: HeaderProps['user']['status'] }) => {
+const UserStatus = ({ status }: { status?: "online" | "away" | "offline" }) => {
     const getStatusColor = () => {
         switch (status) {
             case 'online': return 'bg-green-500';
@@ -462,12 +461,12 @@ export function Header({
                                             alt={user.name}
                                             className="h-8 w-8 rounded-full"
                                         />
-                                        <UserStatus status={user.status} />
+                                        <UserStatus status={user?.status ?? 'offline'} />
                                     </div>
                                 ) : (
                                     <div className="relative h-8 w-8 rounded-full bg-accent flex items-center justify-center">
                                         <User className="h-4 w-4" />
-                                        <UserStatus status={user.status} />
+                                        <UserStatus status={user?.status ?? 'offline'} />
                                     </div>
                                 )}
                             </Button>
