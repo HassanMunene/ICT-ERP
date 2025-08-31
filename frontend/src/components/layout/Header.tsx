@@ -156,7 +156,6 @@ export function Header({
     sidebarCollapsed = false,
     onSidebarToggle,
     showSidebarToggle = true,
-    breadcrumbs,
     quickActions = []
 }: HeaderProps) {
     const navigate = useNavigate();
@@ -179,6 +178,8 @@ export function Header({
         }
     }, [searchQuery, onSearch]);
 
+    console.log(isSearchFocused);
+
     // Filter notifications based on read status
     const { unreadNotificationsList, readNotificationsList } = useMemo(() => {
         const unread = notifications.filter(n => !n.read);
@@ -190,6 +191,7 @@ export function Header({
     const handleMarkAsRead = useCallback((id: string) => {
         // In a real app, this would call an API
         setUnreadNotifications(prev => Math.max(0, prev - 1));
+        console.log(id);
     }, []);
 
     // Mark all notifications as read
