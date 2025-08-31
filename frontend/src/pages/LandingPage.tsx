@@ -9,8 +9,17 @@ import {
     FileText, Briefcase, ChevronDown, Star, Award,
     Globe, Lock, Eye, EyeOff, UserPlus, MoveUp
 } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from '@/lib/utils';
+
 
 const LandingPage = () => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
@@ -137,9 +146,20 @@ const LandingPage = () => {
                 </div>
 
                 <div className="md:hidden">
-                    <Button variant="outline" size="icon">
-                        <ChevronDown className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon">
+                                <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem>Features</DropdownMenuItem>
+                            <DropdownMenuItem>Testimonials</DropdownMenuItem>
+                            <DropdownMenuItem>Pricing</DropdownMenuItem>
+                            <DropdownMenuItem>Sign In</DropdownMenuItem>
+                            <DropdownMenuItem className="text-primary font-semibold">Get Started</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </nav>
 
