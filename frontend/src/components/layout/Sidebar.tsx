@@ -7,8 +7,11 @@ import {
     FolderOpen, Shield, Building2, Calendar, Clock, ChevronDown, ChevronUp,
     Settings, LogOut, User, Search, X
 } from 'lucide-react';
-import { Tooltip } from './Tooltip';
-
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Types
 interface SidebarItem {
@@ -64,8 +67,7 @@ const SidebarItemComponent = memo(({
 
     // Handle section headers differently
     if (item.isSectionHeader) {
-        if (isCollapsed) return null; // Hide section headers when collapsed
-
+        if (isCollapsed) return null;
         return (
             <div className={cn(
                 "px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
@@ -77,82 +79,84 @@ const SidebarItemComponent = memo(({
     }
 
     const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         if (hasChildren) {
-            e.preventDefault();
             onToggleExpand(item.id);
         } else {
             onItemClick(item);
         }
     };
 
-    // Tooltip for collapsed state
-    const TooltipWrapper = ({ children }: { children: React.ReactElement }) => {
-        if (!isCollapsed) return children;
-
-        return (
-            <div >
-                <Tooltip content={
-                    <div className="flex items-center">
-                        {item.title}
-                        {item.badge && (
-                            <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                                {item.badge}
-                            </Badge>
-                        )}
-                    </div>
-                }>
-                    {children}
-                </Tooltip>
+    // Create the link element first
+    const linkElement = (
+        <Link
+            to={item.href}
+            onClick={handleClick}
+            className={cn(
+                'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+                isActive || hasActiveChild
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground',
+                depth > 0 && 'ml-2 py-1.5 text-xs',
+                isCollapsed && 'justify-center px-2'
+            )}
+            aria-current={isActive ? 'page' : undefined}
+        >
+            <div className={cn("flex items-center space-x-3 overflow-hidden", isCollapsed && "space-x-0")}>
+                <item.icon className={cn("h-4 w-4 flex-shrink-0", depth > 0 && "h-3.5 w-3.5")} />
+                {!isCollapsed && <span className="truncate">{item.title}</span>}
             </div>
-        );
-    };
 
-    return (
-        <div className='relative'>
-            <TooltipWrapper>
-                <Link
-                    to={item.href}
-                    onClick={handleClick}
-                    className={cn(
-                        'flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                        'hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                        isActive || hasActiveChild
-                            ? 'bg-accent text-accent-foreground'
-                            : 'text-muted-foreground',
-                        depth > 0 && 'ml-2 py-1.5 text-xs',
-                        isCollapsed && 'justify-center px-2'
+            {!isCollapsed && (
+                <div className="flex items-center space-x-1">
+                    {item.badge !== undefined && item.badge !== '' && (
+                        <Badge
+                            variant={isActive ? "default" : "secondary"}
+                            className="h-5 min-w-[20px] text-xs flex items-center justify-center"
+                        >
+                            {item.badge}
+                        </Badge>
                     )}
-                    aria-current={isActive ? 'page' : undefined}
-                >
-                    <div className={cn("flex items-center space-x-3 overflow-hidden", isCollapsed && "space-x-0")}>
-                        <item.icon className={cn("h-4 w-4 flex-shrink-0", depth > 0 && "h-3.5 w-3.5")} />
-                        {!isCollapsed && <span className="truncate">{item.title}</span>}
-                    </div>
 
-                    {!isCollapsed && (
-                        <div className="flex items-center space-x-1">
-                            {item.badge !== undefined && item.badge !== '' && (
-                                <Badge
-                                    variant={isActive ? "default" : "secondary"}
-                                    className="h-5 min-w-[20px] text-xs flex items-center justify-center"
-                                >
-                                    {item.badge}
-                                </Badge>
-                            )}
-
-                            {hasChildren && (
-                                <div className="ml-1">
-                                    {isExpanded ? (
-                                        <ChevronUp className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronDown className="h-4 w-4" />
-                                    )}
-                                </div>
+                    {hasChildren && (
+                        <div className="ml-1">
+                            {isExpanded ? (
+                                <ChevronUp className="h-4 w-4" />
+                            ) : (
+                                <ChevronDown className="h-4 w-4" />
                             )}
                         </div>
                     )}
-                </Link>
-            </TooltipWrapper>
+                </div>
+            )}
+        </Link>
+    );
+
+    // Wrap with tooltip only when collapsed
+    if (isCollapsed) {
+        return (
+            <Tooltip delayDuration={0}>
+                <TooltipTrigger asChild>
+                    {linkElement}
+                </TooltipTrigger>
+                <TooltipContent side="right" align="center" className="flex items-center gap-1">
+                    {item.title}
+                    {item.badge && (
+                        <Badge variant="secondary" className="h-4 px-1 text-xs">
+                            {item.badge}
+                        </Badge>
+                    )}
+                </TooltipContent>
+            </Tooltip>
+        );
+    }
+
+    return (
+        <div>
+            {linkElement}
 
             {hasChildren && isExpanded && !isCollapsed && (
                 <div className={cn("mt-1 space-y-1", depth > 0 ? 'ml-4' : 'ml-6 border-l pl-4')}>

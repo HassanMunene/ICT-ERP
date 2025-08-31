@@ -5,6 +5,7 @@ import './App.css'
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { ThemeProvider } from "./lib/theme-provider";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { useSidebar } from "./components/hooks/useSidebar";
 import { Plus, Download, Users } from "lucide-react";
 import { PageLoading, ContentSkeleton, AppLoading } from "./components/layout/Loading";
@@ -160,89 +161,91 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <Router>
-        <ThemeProvider>
-          <div className="flex h-screen bg-background">
-            <Sidebar
-              isCollapsed={isCollapsed}
-              onToggleCollapse={toggleCollapse}
-              isMobileOpen={isMobileOpen}
-              onMobileToggle={toggleMobile}
-              userPermissions={['admin']}
-            />
-
-            {/* Main content area */}
-            <div className={cn("flex-1 flex flex-col overflow-hidden transition-all duration-300")}>
-              <Header
-                title="Enterprise Dashboard"
-                onMenuToggle={toggleMobile}
-                showMobileMenu={isMobileOpen}
-                onSidebarToggle={toggleCollapse}
-                sidebarCollapsed={isCollapsed}
-                quickActions={quickActions}
-                notifications={notifications}
-                breadcrumbs={breadcrumbs}
-                user={{
-                  name: 'John Doe',
-                  email: 'john.doe@company.com',
-                  role: 'Project Manager',
-                  department: 'Engineering',
-                  status: 'online'
-                }}
+      <TooltipProvider>
+        <Router>
+          <ThemeProvider>
+            <div className="flex h-screen bg-background">
+              <Sidebar
+                isCollapsed={isCollapsed}
+                onToggleCollapse={toggleCollapse}
+                isMobileOpen={isMobileOpen}
+                onMobileToggle={toggleMobile}
+                userPermissions={['admin']}
               />
 
-              <main className="flex-1 overflow-auto p-6 bg-muted/20">
-                {/* Global navigation loading indicator */}
-                {navigationState === 'navigating' && (
-                  <div className="fixed top-16 left-0 right-0 h-1 z-50">
-                    <div className="h-full bg-primary animate-pulse"></div>
-                  </div>
-                )}
-                <Suspense fallback={<PageLoading />}>
-                  <Routes>
-                    <Route path="/" element={<MainDashboard />} />
-                    <Route path="/hr/*" element={
-                      <Suspense fallback={<ContentSkeleton />}>
-                        <HRPage />
-                      </Suspense>
-                    } />
-                    <Route path="/projects/*" element={
-                      <Suspense fallback={<ContentSkeleton />}>
-                        <ProjectsPage />
-                      </Suspense>
-                    } />
-                    <Route path="/crm/*" element={
-                      <Suspense fallback={<ContentSkeleton />}>
-                        <CRMPage />
-                      </Suspense>
-                    } />
-                    <Route path="/finance/*" element={
-                      <Suspense fallback={<ContentSkeleton />}>
-                        <FinancePage />
-                      </Suspense>
-                    } />
-                    <Route path="/admin/*" element={
-                      <Suspense fallback={<ContentSkeleton />}>
-                        <AdminPage />
-                      </Suspense>
-                    } />
+              {/* Main content area */}
+              <div className={cn("flex-1 flex flex-col overflow-hidden transition-all duration-300")}>
+                <Header
+                  title="Enterprise Dashboard"
+                  onMenuToggle={toggleMobile}
+                  showMobileMenu={isMobileOpen}
+                  onSidebarToggle={toggleCollapse}
+                  sidebarCollapsed={isCollapsed}
+                  quickActions={quickActions}
+                  notifications={notifications}
+                  breadcrumbs={breadcrumbs}
+                  user={{
+                    name: 'John Doe',
+                    email: 'john.doe@company.com',
+                    role: 'Project Manager',
+                    department: 'Engineering',
+                    status: 'online'
+                  }}
+                />
 
-                    {/* 404 Page */}
-                    <Route path="*" element={
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center">
-                          <h1 className="text-4xl font-bold mb-4">404</h1>
-                          <p className="text-muted-foreground">Page not found</p>
+                <main className="flex-1 overflow-auto p-6 bg-muted/20">
+                  {/* Global navigation loading indicator */}
+                  {navigationState === 'navigating' && (
+                    <div className="fixed top-16 left-0 right-0 h-1 z-50">
+                      <div className="h-full bg-primary animate-pulse"></div>
+                    </div>
+                  )}
+                  <Suspense fallback={<PageLoading />}>
+                    <Routes>
+                      <Route path="/" element={<MainDashboard />} />
+                      <Route path="/hr/*" element={
+                        <Suspense fallback={<ContentSkeleton />}>
+                          <HRPage />
+                        </Suspense>
+                      } />
+                      <Route path="/projects/*" element={
+                        <Suspense fallback={<ContentSkeleton />}>
+                          <ProjectsPage />
+                        </Suspense>
+                      } />
+                      <Route path="/crm/*" element={
+                        <Suspense fallback={<ContentSkeleton />}>
+                          <CRMPage />
+                        </Suspense>
+                      } />
+                      <Route path="/finance/*" element={
+                        <Suspense fallback={<ContentSkeleton />}>
+                          <FinancePage />
+                        </Suspense>
+                      } />
+                      <Route path="/admin/*" element={
+                        <Suspense fallback={<ContentSkeleton />}>
+                          <AdminPage />
+                        </Suspense>
+                      } />
+
+                      {/* 404 Page */}
+                      <Route path="*" element={
+                        <div className="flex items-center justify-center h-full">
+                          <div className="text-center">
+                            <h1 className="text-4xl font-bold mb-4">404</h1>
+                            <p className="text-muted-foreground">Page not found</p>
+                          </div>
                         </div>
-                      </div>
-                    } />
-                  </Routes>
-                </Suspense>
-              </main>
+                      } />
+                    </Routes>
+                  </Suspense>
+                </main>
+              </div>
             </div>
-          </div>
-        </ThemeProvider>
-      </Router>
+          </ThemeProvider>
+        </Router>
+      </TooltipProvider>
     </ErrorBoundary>
   );
 }
