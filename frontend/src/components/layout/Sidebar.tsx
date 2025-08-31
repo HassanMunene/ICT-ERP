@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import {
     LayoutDashboard, Users, Briefcase, DollarSign, FileText, Target,
     FolderOpen, Shield, Building2, Calendar, Clock, ChevronDown, ChevronUp,
-    Settings, LogOut, User, Search, X
+    Settings, LogOut, User, Search, X, ChevronRight
 } from 'lucide-react';
 import {
     Tooltip,
@@ -41,9 +41,11 @@ interface SidebarItemProps {
     hasActiveChild: boolean;
     onItemClick: (item: SidebarItem) => void;
     onToggleExpand: (itemId: string) => void;
+    onTemporaryExpand: (shouldExpand: boolean) => void;
     userPermissions?: string[];
     depth?: number;
     isCollapsed?: boolean;
+    isTemporarilyExpanded?: boolean;
 }
 
 // Memoized sidebar item component
@@ -54,9 +56,11 @@ const SidebarItemComponent = memo(({
     hasActiveChild,
     onItemClick,
     onToggleExpand,
+    onTemporaryExpand,
     userPermissions = [],
     depth = 0,
-    isCollapsed = false
+    isCollapsed = false,
+    isTemporarilyExpanded = false
 }: SidebarItemProps) => {
     const location = useLocation();
     const hasChildren = item.children && item.children.length > 0;
@@ -67,7 +71,7 @@ const SidebarItemComponent = memo(({
 
     // Handle section headers differently
     if (item.isSectionHeader) {
-        if (isCollapsed) return null;
+        if (isCollapsed && !isTemporarilyExpanded) return null;
         return (
             <div className={cn(
                 "px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
@@ -83,9 +87,20 @@ const SidebarItemComponent = memo(({
         e.stopPropagation();
 
         if (hasChildren) {
-            onToggleExpand(item.id);
+            if (isCollapsed && !isTemporarilyExpanded) {
+                // if is collapsed and has children, request temporary expansion
+                onTemporaryExpand(true);
+                // small delay to allow expansion animation before showing children
+                setTimeout(() => onToggleExpand(item.id), 50);
+            } else {
+                onToggleExpand(item.id);
+            }
         } else {
             onItemClick(item);
+            // collapse temporary expansion after selection
+            if (isTemporarilyExpanded) {
+                onTemporaryExpand(false);
+            }
         }
     };
 
@@ -101,16 +116,16 @@ const SidebarItemComponent = memo(({
                     ? 'bg-accent text-accent-foreground'
                     : 'text-muted-foreground',
                 depth > 0 && 'ml-2 py-1.5 text-xs',
-                isCollapsed && 'justify-center px-2'
+                (isCollapsed && !isTemporarilyExpanded) && 'justify-center px-2'
             )}
             aria-current={isActive ? 'page' : undefined}
         >
-            <div className={cn("flex items-center space-x-3 overflow-hidden", isCollapsed && "space-x-0")}>
+            <div className={cn("flex items-center space-x-3 overflow-hidden", (isCollapsed && !isTemporarilyExpanded) && "space-x-0")}>
                 <item.icon className={cn("h-4 w-4 flex-shrink-0", depth > 0 && "h-3.5 w-3.5")} />
-                {!isCollapsed && <span className="truncate">{item.title}</span>}
+                {(!isCollapsed || isTemporarilyExpanded) && <span className="truncate">{item.title}</span>}
             </div>
 
-            {!isCollapsed && (
+            {(!isCollapsed || isTemporarilyExpanded) && (
                 <div className="flex items-center space-x-1">
                     {item.badge !== undefined && item.badge !== '' && (
                         <Badge
@@ -136,7 +151,7 @@ const SidebarItemComponent = memo(({
     );
 
     // Wrap with tooltip only when collapsed
-    if (isCollapsed) {
+    if (isCollapsed && !isTemporarilyExpanded) {
         return (
             <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
@@ -149,6 +164,7 @@ const SidebarItemComponent = memo(({
                             {item.badge}
                         </Badge>
                     )}
+                    {hasChildren && <ChevronRight className='h-3 w-3 ml-1' />}
                 </TooltipContent>
             </Tooltip>
         );
@@ -158,7 +174,7 @@ const SidebarItemComponent = memo(({
         <div>
             {linkElement}
 
-            {hasChildren && isExpanded && !isCollapsed && (
+            {hasChildren && isExpanded && (!isCollapsed || isTemporarilyExpanded) && (
                 <div className={cn("mt-1 space-y-1", depth > 0 ? 'ml-4' : 'ml-6 border-l pl-4')}>
                     {item.children!.map((child) => (
                         <SidebarItemComponent
@@ -169,9 +185,11 @@ const SidebarItemComponent = memo(({
                             isExpanded={false}
                             onItemClick={onItemClick}
                             onToggleExpand={onToggleExpand}
+                            onTemporaryExpand={onTemporaryExpand}
                             userPermissions={userPermissions}
                             depth={depth + 1}
                             isCollapsed={isCollapsed}
+                            isTemporarilyExpanded={isTemporarilyExpanded}
                         />
                     ))}
                 </div>
@@ -194,6 +212,7 @@ export function Sidebar({
     const navigate = useNavigate();
     const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
     const [searchTerm, setSearchTerm] = useState('');
+    const [isTemporarilyExpanded, setIsTemporarilyExpanded] = useState(false);
 
     // Generate sidebar items with unique IDs
     const sidebarItems: SidebarItem[] = useMemo(() => [
@@ -324,7 +343,7 @@ export function Sidebar({
 
     // Filter items based on search term
     const filteredItems = useMemo(() => {
-        if (!searchTerm || isCollapsed) return sidebarItems;
+        if (!searchTerm || (isCollapsed && !isTemporarilyExpanded)) return sidebarItems;
 
         const searchLower = searchTerm.toLowerCase();
         return sidebarItems.filter(item => {
@@ -360,7 +379,11 @@ export function Sidebar({
         if (window.innerWidth < 768 && onMobileToggle) {
             onMobileToggle();
         }
-    }, [navigate, onMobileToggle]);
+        // Collapse temporary expansion after selection
+        if (isTemporarilyExpanded) {
+            setIsTemporarilyExpanded(false);
+        }
+    }, [navigate, onMobileToggle, isTemporarilyExpanded]);
 
     // Toggle expanded state for items with children
     const handleToggleExpand = useCallback((itemId: string) => {
@@ -375,9 +398,16 @@ export function Sidebar({
         });
     }, []);
 
+    // Handle temporary expansion
+    const handleTemporaryExpand = useCallback((shouldExpand: boolean) => {
+        setIsTemporarilyExpanded(shouldExpand);
+    }, []);
+
+
+
     // Auto-expand parent when child is active
     useEffect(() => {
-        if (isCollapsed) return; // Don't auto-expand when collapsed
+        if (isCollapsed && !isTemporarilyExpanded) return; // Don't auto-expand when collapsed
 
         const findParentWithActiveChild = (items: SidebarItem[]): string | null => {
             for (const item of items) {
@@ -399,7 +429,7 @@ export function Sidebar({
         if (parentId) {
             setExpandedItems(prev => new Set(prev).add(parentId));
         }
-    }, [location.pathname, sidebarItems, hasActiveChild, isCollapsed]);
+    }, [location.pathname, sidebarItems, hasActiveChild, isCollapsed, isTemporarilyExpanded]);
 
     // Close sidebar when clicking outside on mobile
     useEffect(() => {
@@ -433,6 +463,24 @@ export function Sidebar({
         };
     }, [isMobileOpen]);
 
+    // Auto-collapse temporary expansion after delay
+    useEffect(() => {
+        if (isTemporarilyExpanded) {
+            const timer = setTimeout(() => {
+                setIsTemporarilyExpanded(false);
+            }, 5000); // Collapse after 5 seconds of inactivity
+
+            return () => clearTimeout(timer);
+        }
+    }, [isTemporarilyExpanded]);
+
+    // Reset temporary expansion when mouse leaves sidebar
+    const handleMouseLeave = () => {
+        if (isTemporarilyExpanded) {
+            setIsTemporarilyExpanded(false);
+        }
+    };
+
     return (
         <>
             {/* Mobile overlay */}
@@ -448,14 +496,19 @@ export function Sidebar({
                 className={cn(
                     'fixed inset-y-0 left-0 z-50 flex h-full flex-col border-r bg-background transition-all duration-300 ease-in-out',
                     'md:relative',
-                    isCollapsed ? 'w-16' : 'w-64',
+                    // Use temporary expanded width if temporarily expanded
+                    isTemporarilyExpanded ? 'w-64' : isCollapsed ? 'w-16' : 'w-64',
                     isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
                     className
                 )}
+                onMouseLeave={handleMouseLeave}
             >
                 {/* Header with logo and collapse button */}
-                <div className={cn("flex h-16 items-center border-b px-4", isCollapsed ? "justify-center" : "justify-between")}>
-                    {!isCollapsed ? (
+                <div className={cn(
+                    "flex h-16 items-center border-b px-4",
+                    (isCollapsed && !isTemporarilyExpanded) ? "justify-center" : "justify-between"
+                )}>
+                    {(!isCollapsed || isTemporarilyExpanded) ? (
                         <div className="flex items-center space-x-2">
                             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                                 <span className="text-white font-bold text-sm">S</span>
@@ -481,7 +534,7 @@ export function Sidebar({
                 </div>
 
                 {/* Search bar - hidden when collapsed */}
-                {!isCollapsed && (
+                {(!isCollapsed || isTemporarilyExpanded) && (
                     <div className="border-b p-4">
                         <div className="relative">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -508,8 +561,10 @@ export function Sidebar({
                                 isExpanded={expandedItems.has(item.id)}
                                 onItemClick={handleItemClick}
                                 onToggleExpand={handleToggleExpand}
+                                onTemporaryExpand={handleTemporaryExpand}
                                 userPermissions={userPermissions}
                                 isCollapsed={isCollapsed}
+                                isTemporarilyExpanded={isTemporarilyExpanded}
                             />
                         ))}
                     </div>
@@ -517,12 +572,18 @@ export function Sidebar({
 
                 {/* User footer */}
                 <div className="border-t p-4">
-                    <div className={cn("flex items-center", isCollapsed ? "justify-center" : "justify-between")}>
-                        <div className={cn("flex items-center", isCollapsed ? "space-x-0" : "space-x-3")}>
+                    <div className={cn(
+                        "flex items-center",
+                        (isCollapsed && !isTemporarilyExpanded) ? "justify-center" : "justify-between"
+                    )}>
+                        <div className={cn(
+                            "flex items-center",
+                            (isCollapsed && !isTemporarilyExpanded) ? "space-x-0" : "space-x-3"
+                        )}>
                             <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center">
                                 <User className="h-4 w-4" />
                             </div>
-                            {!isCollapsed && (
+                            {(!isCollapsed || isTemporarilyExpanded) && (
                                 <div className="flex-1 overflow-hidden">
                                     <p className="text-sm font-medium truncate">Admin User</p>
                                     <p className="text-xs text-muted-foreground truncate">admin@company.com</p>
@@ -530,7 +591,7 @@ export function Sidebar({
                             )}
                         </div>
 
-                        {!isCollapsed && (
+                        {(!isCollapsed || isTemporarilyExpanded) && (
                             <button
                                 className="rounded-md p-1.5 hover:bg-accent"
                                 aria-label="Logout"
