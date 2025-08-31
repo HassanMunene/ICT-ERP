@@ -509,19 +509,23 @@ export function Sidebar({
                     (isCollapsed && !isTemporarilyExpanded) ? "justify-center" : "justify-between"
                 )}>
                     {(!isCollapsed || isTemporarilyExpanded) ? (
-                        <div className="flex items-center space-x-2">
+                        <Link to="/">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                                    <span className="text-white font-bold text-sm">S</span>
+                                </div>
+                                <div>
+                                    <h1 className="text-lg font-semibold">ServiceERP</h1>
+                                    <p className="text-xs text-muted-foreground">Multi-Service Firm</p>
+                                </div>
+                            </div>
+                        </Link>
+                    ) : (
+                        <Link to="/">
                             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                                 <span className="text-white font-bold text-sm">S</span>
                             </div>
-                            <div>
-                                <h1 className="text-lg font-semibold">ServiceERP</h1>
-                                <p className="text-xs text-muted-foreground">Multi-Service Firm</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">S</span>
-                        </div>
+                        </Link>
                     )}
 
                     <button
