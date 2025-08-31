@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { cn } from '@/lib/utils';
 
 interface TooltipProps {
     content: React.ReactNode;
-    children: React.ReactElement;
+    children: React.ReactElement<any>;
     disabled?: boolean;
 }
 
@@ -26,7 +25,7 @@ export function Tooltip({ content, children, disabled = false }: TooltipProps) {
     if (disabled) return children;
 
     const clonedChild = React.cloneElement(children, {
-        ref: childRef,
+        ...(typeof children.type === 'string' ? { ref: childRef } : {}),
         onMouseEnter: () => setIsVisible(true),
         onMouseLeave: () => setIsVisible(false),
         onFocus: () => setIsVisible(true),
