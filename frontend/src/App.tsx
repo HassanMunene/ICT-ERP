@@ -17,6 +17,8 @@ const CRMPage = lazy(() => import('./pages/CRMPage'));
 const FinancePage = lazy(() => import('./pages/FinancePage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 
+const HREmployeesPage = lazy(() => import('./pages/HR/HREmployeesPage'));
+
 // Error Boundary Component
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   constructor(props: { children: React.ReactNode }) {
@@ -127,14 +129,12 @@ function App() {
                   </DashboardLayout>
                 } />
 
-                <Route path="/hr/*" element={
-                  <DashboardLayout title="Human Resources">
-                    <Suspense fallback={<ContentSkeleton />}>
-                      <HRPage />
-                    </Suspense>
+                <Route path="/hr/employees" element={
+                  <DashboardLayout title="Employee Management">
+                    <HREmployeesPage />
                   </DashboardLayout>
                 } />
-
+                
                 <Route path="/projects/*" element={
                   <DashboardLayout title="Projects">
                     <Suspense fallback={<ContentSkeleton />}>
