@@ -219,7 +219,7 @@ export function Sidebar({
         {
             id: 'dashboard',
             title: 'Dashboard',
-            href: '/',
+            href: '/dashboard',
             icon: LayoutDashboard,
         },
         {
