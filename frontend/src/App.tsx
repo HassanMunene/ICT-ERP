@@ -11,7 +11,6 @@ import { MinimalLayout } from "./components/layout/MinimalLayout";
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const MainDashboard = lazy(() => import('./pages/MainDashboard'));
-const HRPage = lazy(() => import('./pages/HRPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CRMPage = lazy(() => import('./pages/CRMPage'));
 const FinancePage = lazy(() => import('./pages/FinancePage'));
