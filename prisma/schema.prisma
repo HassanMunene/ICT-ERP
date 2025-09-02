@@ -34,6 +34,10 @@ enum AttendanceStatus {
   HOLIDAY 
   }
 
+enum RoleScope { 
+  SYSTEM 
+  MODULE 
+  }
 model User{
   id String  @id @default(cuid())
   email String @unique
@@ -66,4 +70,30 @@ model User{
   updatedAt      DateTime    @updatedAt
   @@index([departmentId])*/
 }
+model Role {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  scope       RoleScope  @default(MODULE)
+  // e.g., permissions per module kept as many-to-many via RolePermission
+  rolePermissions RolePermission[]
+  //userRoles   UserRole[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
 
+
+model Permission {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., "PROJECT.READ", "FINANCE.POST_JOURNAL"
+  description String?
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  @@id([roleId, permissionId])
+}
