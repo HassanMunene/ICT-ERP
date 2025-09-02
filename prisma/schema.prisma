@@ -41,7 +41,7 @@ model User{
   firstName      String
   lastName       String
   status         UserStatus  @default(ACTIVE)
-  departmentId   String?     
+ /* departmentId   String?     
   department     Department? @relation(fields: [departmentId], references: [id])
   // profiles
   employee       Employee?
@@ -64,6 +64,6 @@ model User{
   notifications  Notification[]
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
-  @@index([departmentId])
+  @@index([departmentId])*/
 }
 
