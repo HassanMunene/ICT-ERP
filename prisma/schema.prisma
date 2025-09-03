@@ -38,6 +38,10 @@ enum RoleScope {
   SYSTEM 
   MODULE 
   }
+
+// ------------------------------------------------------
+// 1) Authentication & Authorization
+// ------------------------------------------------------
 model User{
   id String  @id @default(cuid())
   email String @unique
@@ -46,12 +50,11 @@ model User{
   lastName       String
   status         UserStatus  @default(ACTIVE)
   userRoles      UserRole[]
-
-  /*departmentId   String?     
+  departmentId   String?     
   department     Department? @relation(fields: [departmentId], references: [id])
   // profiles
   employee       Employee?
-  contractor     Contractor?
+  /*contractor     Contractor?
   marketer       Marketer?
   // RBAC
   // cross-module ownership/assigned-to
@@ -104,4 +107,26 @@ model UserRole {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
   @@id([userId, roleId])
+}
+
+// ------------------------------------------------------
+// 2) Personnel Management (HR)
+// ------------------------------------------------------
+
+model Department {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Employee {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position  String?
+  hireDate  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
