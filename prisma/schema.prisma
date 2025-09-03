@@ -56,12 +56,12 @@ model User{
   employee       Employee?
   contractor     Contractor?
   marketer       Marketer?
+  attendance     Attendance[]
+  //leaveRequests  LeaveRequest[]
   // RBAC
   // cross-module ownership/assigned-to
   /*tasks          Task[]           @relation("TaskAssignees")
   timeLogs       Timelog[]
-  attendance     Attendance[]
-  leaveRequests  LeaveRequest[]
   payouts        Payout[]
   opportunities  Opportunity[]    @relation("OpportunityOwner")
   leads          Lead[]           @relation("LeadOwner")
@@ -150,4 +150,16 @@ model Marketer {
   specialty      String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model Attendance {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  status    AttendanceStatus @default(PRESENT)
+  notes     String?
+  createdAt DateTime @default(now())
+  @@unique([userId, date])
+  @@index([date])
 }
