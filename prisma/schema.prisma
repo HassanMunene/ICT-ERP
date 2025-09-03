@@ -57,7 +57,9 @@ model User{
   contractor     Contractor?
   marketer       Marketer?
   attendance     Attendance[]
-  //leaveRequests  LeaveRequest[]
+  leaveRequests  LeaveRequest[]
+  approvedLeaves LeaveRequest[] @relation("LeaveApprover")
+
   // RBAC
   // cross-module ownership/assigned-to
   /*tasks          Task[]           @relation("TaskAssignees")
@@ -162,4 +164,19 @@ model Attendance {
   createdAt DateTime @default(now())
   @@unique([userId, date])
   @@index([date])
+}
+
+model LeaveRequest {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate   DateTime
+  endDate     DateTime
+  reason      String?
+  status      LeaveStatus @default(PENDING)
+  approverId  String?
+  approver    User?       @relation("LeaveApprover", fields: [approverId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  @@index([userId, startDate, endDate])
 }
