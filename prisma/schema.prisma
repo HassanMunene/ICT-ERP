@@ -45,14 +45,15 @@ model User{
   firstName      String
   lastName       String
   status         UserStatus  @default(ACTIVE)
- /* departmentId   String?     
+  userRoles      UserRole[]
+
+  /*departmentId   String?     
   department     Department? @relation(fields: [departmentId], references: [id])
   // profiles
   employee       Employee?
   contractor     Contractor?
   marketer       Marketer?
   // RBAC
-  userRoles      UserRole[]
   // cross-module ownership/assigned-to
   tasks          Task[]           @relation("TaskAssignees")
   timeLogs       Timelog[]
@@ -77,7 +78,7 @@ model Role {
   scope       RoleScope  @default(MODULE)
   // e.g., permissions per module kept as many-to-many via RolePermission
   rolePermissions RolePermission[]
-  //userRoles   UserRole[]
+  userRoles   UserRole[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -96,4 +97,11 @@ model RolePermission {
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
   @@id([roleId, permissionId])
+}
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([userId, roleId])
 }
