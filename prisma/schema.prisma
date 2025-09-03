@@ -59,6 +59,8 @@ model User{
   attendance     Attendance[]
   leaveRequests  LeaveRequest[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
+  //contacts       Contact[]        @relation("ContactOwner")
+
 
   // RBAC
   // cross-module ownership/assigned-to
@@ -67,7 +69,6 @@ model User{
   payouts        Payout[]
   opportunities  Opportunity[]    @relation("OpportunityOwner")
   leads          Lead[]           @relation("LeadOwner")
-  contacts       Contact[]        @relation("ContactOwner")
   companies      Company[]        @relation("CompanyAccountMgr")
   comms          CommunicationLog[] @relation("CommAuthor")
   // docs & notifications
@@ -179,4 +180,22 @@ model LeaveRequest {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   @@index([userId, startDate, endDate])
+}
+
+// ------------------------------------------------------
+// 3) Project & Service Delivery
+// ------------------------------------------------------
+
+model Client {
+  id          String     @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  website     String?
+  address     String?
+  //contacts    Contact[]  // from CRM (shared)
+  //projects    Project[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  @@index([name])
 }
