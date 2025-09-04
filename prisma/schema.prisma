@@ -218,7 +218,7 @@ model Project {
   budget        Decimal?      @db.Decimal(18,2)
   startDate     DateTime?
   endDate       DateTime?
-  //phases        ProjectPhase[]
+  phases        ProjectPhase[]
   //tasks         Task[]
   //deliverables  Deliverable[]
   //invoices      Invoice[]
@@ -226,4 +226,18 @@ model Project {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
  //npx  @@index([clientId, status])
+}
+
+model ProjectPhase {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  order       Int
+  startDate   DateTime?
+  endDate     DateTime?
+  //tasks       Task[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([projectId, order])
 }
