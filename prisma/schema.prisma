@@ -39,6 +39,21 @@ enum RoleScope {
   MODULE 
   }
 
+  enum ProjectStatus {
+     PLANNED 
+     ACTIVE 
+     ON_HOLD 
+     COMPLETED 
+     CANCELLED 
+     }
+
+enum TaskStatus { 
+  TODO 
+  IN_PROGRESS 
+  BLOCKED 
+  DONE 
+  }
+
 // ------------------------------------------------------
 // 1) Authentication & Authorization
 // ------------------------------------------------------
@@ -59,6 +74,8 @@ model User{
   attendance     Attendance[]
   leaveRequests  LeaveRequest[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
+  timeLogs       Timelog[]
+
   //contacts       Contact[]        @relation("ContactOwner")
 
 
@@ -194,8 +211,115 @@ model Client {
   website     String?
   address     String?
   //contacts    Contact[]  // from CRM (shared)
-  //projects    Project[]
+  projects    Project[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   @@index([name])
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  name          String
+  description   String?
+  status        ProjectStatus @default(PLANNED)
+  budget        Decimal?      @db.Decimal(18,2)
+  startDate     DateTime?
+  endDate       DateTime?
+  phases        ProjectPhase[]
+  tasks         Task[]
+  deliverables  Deliverable[]
+  //invoices      Invoice[]
+  //expenses      Expense[]     // allocated expenses
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+ //npx  @@index([clientId, status])
+}
+
+model ProjectPhase {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name        String
+  order       Int
+  startDate   DateTime?
+  endDate     DateTime?
+  tasks       Task[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([projectId, order])
+}
+
+model Task {
+  id           String      @id @default(cuid())
+  projectId    String
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  phaseId      String?
+  phase        ProjectPhase? @relation(fields: [phaseId], references: [id], onDelete: SetNull)
+  title        String
+  description  String?
+  status       TaskStatus    @default(TODO)
+  timelogs     Timelog[]
+  deliverables Deliverable[]
+
+  //priority     Priority      @default(MEDIUM)
+  dueDate      DateTime?
+  // Many-to-many assignees
+  //assignees    User[]        @relation("TaskAssignees")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@index([projectId, phaseId, status, dueDate])
+}
+
+model Timelog {
+  id         String   @id @default(cuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startTime  DateTime
+  endTime    DateTime
+  notes      String?
+  createdAt  DateTime  @default(now())
+  @@index([taskId, userId, startTime])
+}
+
+model Deliverable {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskId      String?
+  task        Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  title       String
+  description String?
+  // Link to Document service
+  documentId  String?
+  //document    Document? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  dueDate     DateTime?
+  submittedAt DateTime?
+  approvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([projectId, taskId])
+}
+
+// ------------------------------------------------------
+// 4) Commission & Incentive
+// ------------------------------------------------------
+model CommissionRule {
+  id           String   @id @default(cuid())
+  ruleName     String
+  description  String
+    // JSON criteria example: { "appliesTo": "MARKETER", "projectMinBudget": 50000, "stage": "COMPLETED" }
+  criteria     Json
+  percentage   Decimal? @db.Decimal(8,4)
+  fixedAmount  Decimal? @db.Decimal(18,2)
+  startDate    DateTime?
+  endDate      DateTime?
+  //payouts        Payouts[]
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+
 }
