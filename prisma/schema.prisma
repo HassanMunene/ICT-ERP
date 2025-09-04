@@ -303,3 +303,23 @@ model Deliverable {
   updatedAt   DateTime @updatedAt
   @@index([projectId, taskId])
 }
+
+// ------------------------------------------------------
+// 4) Commission & Incentive
+// ------------------------------------------------------
+model CommissionRule {
+  id           String   @id @default(cuid())
+  ruleName     String
+  description  String
+    // JSON criteria example: { "appliesTo": "MARKETER", "projectMinBudget": 50000, "stage": "COMPLETED" }
+  criteria     Json
+  percentage   Decimal? @db.Decimal(8,4)
+  fixedAmount  Decimal? @db.Decimal(18,2)
+  startDate    DateTime?
+  endDate      DateTime?
+  //payouts        Payouts[]
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+
+}
