@@ -39,6 +39,14 @@ enum RoleScope {
   MODULE 
   }
 
+  enum ProjectStatus {
+     PLANNED 
+     ACTIVE 
+     ON_HOLD 
+     COMPLETED 
+     CANCELLED 
+     }
+
 // ------------------------------------------------------
 // 1) Authentication & Authorization
 // ------------------------------------------------------
@@ -194,8 +202,28 @@ model Client {
   website     String?
   address     String?
   //contacts    Contact[]  // from CRM (shared)
-  //projects    Project[]
+  projects    Project[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   @@index([name])
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  name          String
+  description   String?
+  status        ProjectStatus @default(PLANNED)
+  budget        Decimal?      @db.Decimal(18,2)
+  startDate     DateTime?
+  endDate       DateTime?
+  //phases        ProjectPhase[]
+  //tasks         Task[]
+  //deliverables  Deliverable[]
+  //invoices      Invoice[]
+  //expenses      Expense[]     // allocated expenses
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+ //npx  @@index([clientId, status])
 }
