@@ -76,6 +76,8 @@ model User{
   attendance     Attendance[]
   leaveRequests  LeaveRequest[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
+  timeLogs       Timelog[]
+
   //contacts       Contact[]        @relation("ContactOwner")
 
 
@@ -260,6 +262,7 @@ model Task {
   title        String
   description  String?
   status       TaskStatus    @default(TODO)
+  timelogs     Timelog[]
   //priority     Priority      @default(MEDIUM)
   dueDate      DateTime?
   // Many-to-many assignees
@@ -269,4 +272,17 @@ model Task {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   @@index([projectId, phaseId, status, dueDate])
+}
+
+model Timelog {
+  id         String   @id @default(cuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startTime  DateTime
+  endTime    DateTime
+  notes      String?
+  createdAt  DateTime  @default(now())
+  @@index([taskId, userId, startTime])
 }
