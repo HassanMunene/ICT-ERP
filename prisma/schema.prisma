@@ -72,6 +72,23 @@ enum Priority {
   URGENT 
   }
 
+enum LeadStatus { 
+  NEW 
+  CONTACTED 
+  QUALIFIED 
+  DISQUALIFIED 
+  CONVERTED 
+  }
+
+enum OpportunityStage { 
+  PROSPECTING 
+  QUALIFICATION 
+  PROPOSAL 
+  NEGOTIATION 
+  CLOSED_WON 
+  CLOSED_LOST 
+  }
+
 
 // ------------------------------------------------------
 // 1) Authentication & Authorization
@@ -100,18 +117,17 @@ model User{
 
   // RBAC
   // cross-module ownership/assigned-to
-  /*tasks          Task[]           @relation("TaskAssignees")
-  timeLogs       Timelog[]
+  tasks          Task[]           @relation("TaskAssignees")
   payouts        Payout[]
   opportunities  Opportunity[]    @relation("OpportunityOwner")
   leads          Lead[]           @relation("LeadOwner")
   companies      Company[]        @relation("CompanyAccountMgr")
   comms          CommunicationLog[] @relation("CommAuthor")
   // docs & notifications
-  notifications  Notification[]
+  /*notifications  Notification[]
   createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  @@index([departmentId])*/
+  updatedAt      DateTime    @updatedAt */
+  @@index([departmentId])
 }
 model Role {
   id          String     @id @default(cuid())
@@ -284,7 +300,7 @@ model Task {
   priority     Priority      @default(MEDIUM)
   dueDate      DateTime?
   // Many-to-many assignees
-  //assignees    User[]        @relation("TaskAssignees")
+  assignees    User[]        @relation("TaskAssignees")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   @@index([projectId, phaseId, status, dueDate])
@@ -335,7 +351,7 @@ model CommissionRule {
   fixedAmount  Decimal? @db.Decimal(18,2)
   startDate    DateTime?
   endDate      DateTime?
-  //payouts        Payouts[]
+  payout        Payout[]
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
@@ -345,9 +361,9 @@ model CommissionRule {
 model Payout {
   id               String        @id @default(cuid())
   beneficiaryId    String        // marketer/contractor user id
-  //beneficiary      User          @relation(fields: [beneficiaryId], references: [id], onDelete: Restrict)
-  //commissionRuleId String
-  //commissionRule   CommissionRule @relation(fields: [commissionRuleId], references: [id], onDelete: Restrict)
+  beneficiary      User          @relation(fields: [beneficiaryId], references: [id], onDelete: Restrict)
+  commissionRuleId String
+  commissionRule   CommissionRule @relation(fields: [commissionRuleId], references: [id], onDelete: Restrict)
   referenceType    String         // e.g., "PROJECT" | "INVOICE"
   referenceId      String         // id of referenced entity
   amount           Decimal        @db.Decimal(18,2)
@@ -357,7 +373,7 @@ model Payout {
   transactions     CommissionTransaction[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  //@@index([beneficiaryId, status])
+  @@index([beneficiaryId, status])
 }
 
 model CommissionTransaction {
@@ -368,4 +384,96 @@ model CommissionTransaction {
   amount       Decimal        @db.Decimal(18,2)
   notes        String?
   createdAt    DateTime       @default(now())
+}
+
+// ------------------------------------------------------
+// 5) CRM
+// ------------------------------------------------------
+
+model Lead {
+  id          String     @id @default(cuid())
+  title       String
+  source      String?
+  status      LeadStatus @default(NEW)
+  ownerId     String?
+  owner       User?      @relation("LeadOwner", fields: [ownerId], references: [id])
+  companyId   String?
+  //company     Company?   @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  //contactId   String?
+  //contact     Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([status, ownerId])
+}
+model Company {
+  id             String      @id @default(cuid())
+  name           String
+  industry       String?
+  size           String?
+  accountMgrId   String?
+  accountMgr     User?       @relation("CompanyAccountMgr", fields: [accountMgrId], references: [id])
+  contacts       Contact[]
+  opportunities  Opportunity[]
+  //client         Client?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([name])
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String?  @unique
+  phone       String?
+  position    String?
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  ownerId     String?
+  //owner       User?    @relation("ContactOwner", fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([companyId])
+}
+
+model Opportunity {
+  id            String            @id @default(cuid())
+  title         String
+  companyId     String?
+  company       Company?          @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  contactId     String?
+  //contact       Contact?          @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  ownerId       String?
+  owner         User?             @relation("OpportunityOwner", fields: [ownerId], references: [id])
+  value         Decimal?          @db.Decimal(18,2)
+  expectedClose DateTime?
+  stage         OpportunityStage  @default(PROSPECTING)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@index([stage, ownerId])
+}
+
+model SalesPipelineStage {
+  id       String           @id @default(cuid())
+  name     String           @unique
+  order    Int              @unique
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model CommunicationLog {
+  id          String   @id @default(cuid())
+  // polymorphic: can link to Lead, Contact, Company, Opportunity via type+id
+  entityType  String   // "LEAD" | "CONTACT" | "COMPANY" | "OPPORTUNITY" | "PROJECT"
+  entityId    String
+  type        String   // email, call, meeting, note
+  subject     String?
+  body        String?
+  date        DateTime @default(now())
+  authorId    String?
+  author      User?    @relation("CommAuthor", fields: [authorId], references: [id])
+  createdAt   DateTime @default(now())
+  @@index([entityType, entityId, date])
 }
