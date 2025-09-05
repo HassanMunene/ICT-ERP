@@ -54,6 +54,25 @@ enum TaskStatus {
   DONE 
   }
 
+  enum PayoutStatus { 
+    PENDING 
+    APPROVED 
+    PAID 
+    CANCELLED 
+    }
+enum TransactionType { 
+  CREDIT 
+  DEBIT 
+  ADJUSTMENT 
+  }
+enum Priority { 
+  LOW 
+  MEDIUM 
+  HIGH 
+  URGENT 
+  }
+
+
 // ------------------------------------------------------
 // 1) Authentication & Authorization
 // ------------------------------------------------------
@@ -234,7 +253,7 @@ model Project {
   //expenses      Expense[]     // allocated expenses
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
- //npx  @@index([clientId, status])
+ @@index([clientId, status])
 }
 
 model ProjectPhase {
@@ -262,8 +281,7 @@ model Task {
   status       TaskStatus    @default(TODO)
   timelogs     Timelog[]
   deliverables Deliverable[]
-
-  //priority     Priority      @default(MEDIUM)
+  priority     Priority      @default(MEDIUM)
   dueDate      DateTime?
   // Many-to-many assignees
   //assignees    User[]        @relation("TaskAssignees")
@@ -322,4 +340,32 @@ model CommissionRule {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
 
+}
+
+model Payout {
+  id               String        @id @default(cuid())
+  beneficiaryId    String        // marketer/contractor user id
+  //beneficiary      User          @relation(fields: [beneficiaryId], references: [id], onDelete: Restrict)
+  //commissionRuleId String
+  //commissionRule   CommissionRule @relation(fields: [commissionRuleId], references: [id], onDelete: Restrict)
+  referenceType    String         // e.g., "PROJECT" | "INVOICE"
+  referenceId      String         // id of referenced entity
+  amount           Decimal        @db.Decimal(18,2)
+  status           PayoutStatus   @default(PENDING)
+  scheduledDate    DateTime?
+  paidDate         DateTime?
+  transactions     CommissionTransaction[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  //@@index([beneficiaryId, status])
+}
+
+model CommissionTransaction {
+  id           String         @id @default(cuid())
+  payoutId     String
+  payout       Payout         @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  type         TransactionType
+  amount       Decimal        @db.Decimal(18,2)
+  notes        String?
+  createdAt    DateTime       @default(now())
 }
