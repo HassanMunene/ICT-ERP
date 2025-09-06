@@ -88,6 +88,12 @@ enum OpportunityStage {
   CLOSED_WON 
   CLOSED_LOST 
   }
+enum JournalType { 
+  GENERAL 
+  PAYMENT 
+  RECEIPT 
+  ADJUSTMENT 
+  }
 
 
 // ------------------------------------------------------
@@ -491,6 +497,19 @@ model ChartOfAccounts {
   parent      ChartOfAccounts? @relation("ParentAccount", fields: [parentId], references: [id])
   children    ChartOfAccounts[] @relation("ParentAccount")
   isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model JournalEntry {
+  id          String     @id @default(cuid())
+  entryNo     String     @unique
+  date        DateTime
+  type        JournalType @default(GENERAL)
+  memo        String?
+  postedById  String?
+  postedBy    User?      @relation(fields: [postedById], references: [id])
+  lines       JournalLine[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
