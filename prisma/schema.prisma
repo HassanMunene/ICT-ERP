@@ -477,3 +477,20 @@ model CommunicationLog {
   createdAt   DateTime @default(now())
   @@index([entityType, entityId, date])
 }
+
+// ------------------------------------------------------
+// 6) Finance & Accounting
+// ------------------------------------------------------
+
+model ChartOfAccounts {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g., 1000, 4000...
+  name        String
+  type        String   // ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+  parentId    String?
+  parent      ChartOfAccounts? @relation("ParentAccount", fields: [parentId], references: [id])
+  children    ChartOfAccounts[] @relation("ParentAccount")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
