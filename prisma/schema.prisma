@@ -129,6 +129,7 @@ model User{
   leads          Lead[]           @relation("LeadOwner")
   companies      Company[]        @relation("CompanyAccountMgr")
   comms          CommunicationLog[] @relation("CommAuthor")
+
   // docs & notifications
   /*notifications  Notification[]
   createdAt      DateTime    @default(now())
@@ -508,8 +509,8 @@ model JournalEntry {
   type        JournalType @default(GENERAL)
   memo        String?
   postedById  String?
-  postedBy    User?      @relation(fields: [postedById], references: [id])
-  lines       JournalLine[]
+  //postedBy    User?      @relation(fields: [postedById], references: [id])
+  //lines       JournalLine[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
