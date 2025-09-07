@@ -101,6 +101,13 @@ enum JournalType {
     SALES 
     }
 
+enum InvoiceStatus { 
+  DRAFT 
+  SENT 
+  PARTIALLY_PAID 
+  PAID 
+  VOID 
+  }
 
 
 // ------------------------------------------------------
@@ -124,8 +131,7 @@ model User{
   leaveRequests  LeaveRequest[]
   approvedLeaves LeaveRequest[] @relation("LeaveApprover")
   timeLogs       Timelog[]
-
-  //contacts       Contact[]        @relation("ContactOwner")
+  contacts       Contact[]        @relation("ContactOwner")
 
 
   // RBAC
@@ -258,8 +264,8 @@ model Client {
   email       String?
   phone       String?
   website     String?
-  address     String?
-  //contacts    Contact[]  // from CRM (shared)
+  //address     String?
+  ///contacts    Contact[]  // from CRM (shared)
   projects    Project[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -279,7 +285,7 @@ model Project {
   phases        ProjectPhase[]
   tasks         Task[]
   deliverables  Deliverable[]
-  //invoices      Invoice[]
+  invoices      Invoice[]
   //expenses      Expense[]     // allocated expenses
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -412,9 +418,9 @@ model Lead {
   ownerId     String?
   owner       User?      @relation("LeadOwner", fields: [ownerId], references: [id])
   companyId   String?
-  //company     Company?   @relation(fields: [companyId], references: [id], onDelete: SetNull)
-  //contactId   String?
-  //contact     Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  company     Company?   @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  contactId   String?
+  contact     Contact?   @relation(fields: [contactId], references: [id], onDelete: SetNull)
   notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -429,6 +435,7 @@ model Company {
   accountMgr     User?       @relation("CompanyAccountMgr", fields: [accountMgrId], references: [id])
   contacts       Contact[]
   opportunities  Opportunity[]
+  leads Lead[]
   //client         Client?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -442,10 +449,12 @@ model Contact {
   email       String?  @unique
   phone       String?
   position    String?
+  leads Lead[]
   companyId   String?
+  opportunities Opportunity[] 
   company     Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
   ownerId     String?
-  //owner       User?    @relation("ContactOwner", fields: [ownerId], references: [id])
+  owner       User?    @relation("ContactOwner", fields: [ownerId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   @@index([companyId])
@@ -457,7 +466,7 @@ model Opportunity {
   companyId     String?
   company       Company?          @relation(fields: [companyId], references: [id], onDelete: SetNull)
   contactId     String?
-  //contact       Contact?          @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  contact       Contact?          @relation(fields: [contactId], references: [id], onDelete: SetNull)
   ownerId       String?
   owner         User?             @relation("OpportunityOwner", fields: [ownerId], references: [id])
   value         Decimal?          @db.Decimal(18,2)
@@ -544,4 +553,26 @@ model TaxRule {
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model Invoice {
+  id           String        @id @default(cuid())
+  invoiceNo    String        @unique
+  //clientId     String
+  //client       Client        @relation(fields: [clientId], references: [id])
+  projectId    String?
+  project      Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  status       InvoiceStatus @default(DRAFT)
+  issueDate    DateTime
+  dueDate      DateTime?
+  currency     String        @default("KES")
+  subtotal     Decimal       @db.Decimal(18,2)
+  taxTotal     Decimal       @db.Decimal(18,2) @default(0)
+  total        Decimal       @db.Decimal(18,2)
+  balance      Decimal       @db.Decimal(18,2)
+  //items        InvoiceItem[]
+  //payments     PaymentApplication[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  //@@index([clientId, projectId, status])
 }
