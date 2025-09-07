@@ -485,6 +485,7 @@ model CommunicationLog {
   @@index([entityType, entityId, date])
 }
 
+<<<<<<< Updated upstream
 // ------------------------------------------------------
 // 6) Finance & Accounting
 // ------------------------------------------------------
@@ -514,3 +515,4 @@ model JournalEntry {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
