@@ -113,6 +113,21 @@ enum InvoiceStatus {
   VOID
 }
 
+enum PaymentMethod {
+  CASH
+  MPESA
+  BANK_TRANSFER
+  CARD
+  CHECK
+  OTHER
+}
+
+enum PaymentDirection {
+  INBOUND
+  OUTBOUND
+}
+// customer pays us / we pay vendor
+
 // ------------------------------------------------------
 // 1) Authentication & Authorization
 // ------------------------------------------------------
@@ -147,6 +162,7 @@ model User {
 
   // docs & notifications
   /**
+   * /**
    * /*notifications  Notification[]
    * createdAt      DateTime    @default(now())
    * updatedAt      DateTime    @updatedAt
@@ -395,20 +411,21 @@ model CommissionRule {
 }
 
 model Payout {
-  id               String                  @id @default(cuid())
-  beneficiaryId    String // marketer/contractor user id
-  beneficiary      User                    @relation(fields: [beneficiaryId], references: [id], onDelete: Restrict)
-  commissionRuleId String
-  commissionRule   CommissionRule          @relation(fields: [commissionRuleId], references: [id], onDelete: Restrict)
-  referenceType    String // e.g., "PROJECT" | "INVOICE"
-  referenceId      String // id of referenced entity
-  amount           Decimal                 @db.Decimal(18, 2)
-  status           PayoutStatus            @default(PENDING)
-  scheduledDate    DateTime?
-  paidDate         DateTime?
-  transactions     CommissionTransaction[]
-  createdAt        DateTime                @default(now())
-  updatedAt        DateTime                @updatedAt
+  id                 String                  @id @default(cuid())
+  beneficiaryId      String // marketer/contractor user id
+  beneficiary        User                    @relation(fields: [beneficiaryId], references: [id], onDelete: Restrict)
+  commissionRuleId   String
+  commissionRule     CommissionRule          @relation(fields: [commissionRuleId], references: [id], onDelete: Restrict)
+  referenceType      String // e.g., "PROJECT" | "INVOICE"
+  referenceId        String // id of referenced entity
+  amount             Decimal                 @db.Decimal(18, 2)
+  status             PayoutStatus            @default(PENDING)
+  scheduledDate      DateTime?
+  paidDate           DateTime?
+  transactions       CommissionTransaction[]
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  PaymentApplication PaymentApplication[]
 
   @@index([beneficiaryId, status])
 }
@@ -584,24 +601,24 @@ model TaxRule {
 }
 
 model Invoice {
-  id        String        @id @default(cuid())
-  invoiceNo String        @unique
+  id        String               @id @default(cuid())
+  invoiceNo String               @unique
   clientId  String
-  client    Client        @relation(fields: [clientId], references: [id])
+  client    Client               @relation(fields: [clientId], references: [id])
   projectId String?
-  project   Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  status    InvoiceStatus @default(DRAFT)
+  project   Project?             @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  status    InvoiceStatus        @default(DRAFT)
   issueDate DateTime
   dueDate   DateTime?
-  currency  String        @default("KES")
-  subtotal  Decimal       @db.Decimal(18, 2)
-  taxTotal  Decimal       @default(0) @db.Decimal(18, 2)
-  total     Decimal       @db.Decimal(18, 2)
-  balance   Decimal       @db.Decimal(18, 2)
+  currency  String               @default("KES")
+  subtotal  Decimal              @db.Decimal(18, 2)
+  taxTotal  Decimal              @default(0) @db.Decimal(18, 2)
+  total     Decimal              @db.Decimal(18, 2)
+  balance   Decimal              @db.Decimal(18, 2)
   items     InvoiceItem[]
-  //payments     PaymentApplication[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  payments  PaymentApplication[]
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
   //@@index([clientId, projectId, status])
 }
 
@@ -632,4 +649,30 @@ model Expense {
   createdAt   DateTime        @default(now())
 
   @@index([projectId, date])
+}
+
+model Payment {
+  id           String               @id @default(cuid())
+  direction    PaymentDirection
+  method       PaymentMethod
+  referenceNo  String?
+  date         DateTime
+  amount       Decimal              @db.Decimal(18, 2)
+  // Customer payments apply to Invoices; vendor/contractor payments may link to Expenses or Payouts
+  applications PaymentApplication[]
+  createdAt    DateTime             @default(now())
+}
+
+model PaymentApplication {
+  id        String   @id @default(cuid())
+  paymentId String
+  payment   Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  invoiceId String?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  payoutId  String?
+  payout    Payout?  @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+  amount    Decimal  @db.Decimal(18, 2)
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId, payoutId])
 }
