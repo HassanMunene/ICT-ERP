@@ -548,6 +548,7 @@ model TaxRule {
   id            String   @id @default(cuid())
   name          String
   type          TaxType
+  items        InvoiceItem[]
   rate          Decimal  @db.Decimal(8,4) // e.g., 0.1600 for 16%
   isWithholding Boolean  @default(false)
   isActive      Boolean  @default(true)
@@ -570,9 +571,21 @@ model Invoice {
   taxTotal     Decimal       @db.Decimal(18,2) @default(0)
   total        Decimal       @db.Decimal(18,2)
   balance      Decimal       @db.Decimal(18,2)
-  //items        InvoiceItem[]
+  items        InvoiceItem[]
   //payments     PaymentApplication[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   //@@index([clientId, projectId, status])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Decimal  @db.Decimal(18,4)
+  unitPrice   Decimal  @db.Decimal(18,2)
+  lineTotal   Decimal  @db.Decimal(18,2)
+  taxRuleId   String?
+  taxRule     TaxRule? @relation(fields: [taxRuleId], references: [id])
 }
