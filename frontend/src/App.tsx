@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React, { useEffect, useState, Suspense, lazy } from "react";
+import { Toaster } from "sonner";
 
 import './App.css'
 import { ThemeProvider } from "./lib/theme-provider";
@@ -10,6 +11,8 @@ import { MinimalLayout } from "./components/layout/MinimalLayout";
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const WaitingApproval = lazy(() => import('./pages/WaitingApproval'));
 const MainDashboard = lazy(() => import('./pages/MainDashboard'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CRMPage = lazy(() => import('./pages/CRMPage'));
@@ -90,6 +93,7 @@ function App() {
 
   return (
     <ErrorBoundary>
+      <Toaster position="top-center" />
       <TooltipProvider>
         <Router>
           <ThemeProvider>
@@ -116,9 +120,15 @@ function App() {
                   </MinimalLayout>
                 } />
 
+                <Route path="/waiting-approval" element={
+                  <MinimalLayout>
+                    <WaitingApproval />
+                  </MinimalLayout>
+                } />
+
                 <Route path="/register" element={
                   <MinimalLayout>
-                    <div>Register Page</div>
+                    <RegistrationPage />
                   </MinimalLayout>
                 } />
 
