@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import './App.css'
 import { ThemeProvider } from "./lib/theme-provider";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { PageLoading, ContentSkeleton, AppLoading } from "./components/layout/Loading";
+import { PageLoading, ContentSkeleton } from "./components/layout/Loading";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { MinimalLayout } from "./components/layout/MinimalLayout";
 
@@ -60,17 +60,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 function App() {
-  const [isAppLoading, setIsAppLoading] = useState(true);
   const [navigationState, setNavigationState] = useState<'idle' | 'navigating'>('idle');
-
-  // Simulate Application Loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsAppLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle navigation events for loading states
   useEffect(() => {
@@ -86,10 +76,6 @@ function App() {
       window.removeEventListener('load', handleComplete);
     };
   }, []);
-
-  if (isAppLoading) {
-    return <AppLoading />;
-  }
 
   return (
     <ErrorBoundary>

@@ -30,13 +30,18 @@ const formSchema = z.object({
     lastName: z.string().min(2, 'Last name must be at least 2 characters'),
     email: z.email('Please enter a valid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
     terms: z.boolean().refine(val => val, 'You must accept the terms and conditions'),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords Do not match",
+    path: ["ConfirmPassword"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export function RegistrationForm() {
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const form = useForm<FormValues>({
@@ -46,6 +51,7 @@ export function RegistrationForm() {
             lastName: '',
             email: '',
             password: '',
+            confirmPassword: '',
             terms: false,
         },
     });
@@ -53,6 +59,10 @@ export function RegistrationForm() {
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const password = e.target.value;
         form.setValue('password', password);
+    };
+
+    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        form.setValue('confirmPassword', e.target.value, { shouldValidate: true });
     };
 
     async function onSubmit(values: FormValues) {
@@ -222,6 +232,39 @@ export function RegistrationForm() {
                                                                 )}
                                                             </button>
                                                         </div>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* Confirm Password */}
+                                    <FormField
+                                        control={form.control}
+                                        name="confirmPassword"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Confirm Password *</FormLabel>
+                                                <FormControl>
+                                                    <div className="relative">
+                                                        <Input
+                                                            type={showConfirmPassword ? 'text' : 'password'}
+                                                            placeholder="Confirm your password"
+                                                            {...field}
+                                                            onChange={handleConfirmPasswordChange}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                        >
+                                                            {showConfirmPassword ? (
+                                                                <EyeOff className="h-4 w-4" />
+                                                            ) : (
+                                                                <Eye className="h-4 w-4" />
+                                                            )}
+                                                        </button>
                                                     </div>
                                                 </FormControl>
                                                 <FormMessage />
