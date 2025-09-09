@@ -24,3 +24,18 @@ export const formatPhoneNumber = (phone: string) => {
   }
   return phone;
 };
+
+export const calculateBusinessDays = (startDate: Date, endDate: Date): number => {
+  let count = 0;
+  const current = new Date(startDate);
+
+  while (current <= endDate) {
+    const dayOfWeek = current.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Skip weekends
+      count++;
+    }
+    current.setDate(current.getDate() + 1);
+  }
+
+  return count;
+};

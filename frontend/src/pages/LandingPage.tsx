@@ -1,13 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     ArrowRight, BarChart3, Users, Building2, DollarSign,
     FileText, Briefcase, ChevronDown, Star, Award,
-    Globe, Lock, Eye, EyeOff, UserPlus, MoveUp
+    Globe, Lock, MoveUp
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -17,14 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 
-
 const LandingPage = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isLogin, setIsLogin] = useState(true);
-    const [showPassword, setShowPassword] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [activeTab, setActiveTab] = useState('business');
+    const activeTab = 'business';
 
     // Refs for section navigation
     const featuresRef = useRef<HTMLDivElement>(null);
@@ -141,8 +134,12 @@ const LandingPage = () => {
                     <button onClick={() => scrollToSection(featuresRef)} className="text-sm font-medium hover:text-primary transition-colors">Features</button>
                     <button onClick={() => scrollToSection(testimonialsRef)} className="text-sm font-medium hover:text-primary transition-colors">Testimonials</button>
                     <button onClick={() => scrollToSection(pricingRef)} className="text-sm font-medium hover:text-primary transition-colors">Pricing</button>
-                    <Button variant="ghost" onClick={() => setIsLogin(true)}>Sign In</Button>
-                    <Button onClick={() => setIsLogin(false)}>Get Started</Button>
+                    <Button variant="ghost" asChild>
+                        <Link to="/login">Sign In</Link>
+                    </Button>
+                    <Button asChild>
+                        <Link to="/register">Get Started</Link>
+                    </Button>
                 </div>
 
                 <div className="md:hidden">
@@ -156,8 +153,12 @@ const LandingPage = () => {
                             <DropdownMenuItem>Features</DropdownMenuItem>
                             <DropdownMenuItem>Testimonials</DropdownMenuItem>
                             <DropdownMenuItem>Pricing</DropdownMenuItem>
-                            <DropdownMenuItem>Sign In</DropdownMenuItem>
-                            <DropdownMenuItem className="text-primary font-semibold">Get Started</DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link to="/login">Sign In</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-primary font-semibold" asChild>
+                                <Link to="/register">Get Started</Link>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
@@ -166,8 +167,8 @@ const LandingPage = () => {
             {/* Hero Section */}
             <section className="container mx-auto px-4 sm:px-6 py-12 md:py-20 lg:py-24">
                 <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-                    <div className="flex-1 space-y-6">
-                        <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm bg-primary/10 text-primary">
+                    <div className="flex-1 space-y-6 text-center lg:text-left">
+                        <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm bg-primary/10 text-primary mx-auto lg:mx-0">
                             <Award className="h-4 w-4 mr-2" />
                             Enterprise Grade ERP Solution
                         </div>
@@ -176,13 +177,13 @@ const LandingPage = () => {
                             Transform Your <span className="text-primary">Service Business</span> Operations
                         </h1>
 
-                        <p className="text-lg text-muted-foreground max-w-2xl">
+                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto lg:mx-0">
                             All-in-one ERP platform designed for multi-service firms. Streamline operations, boost productivity, and drive growth with our comprehensive solution.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
                             <Button size="lg" className="text-base sm:text-lg py-6 px-8" asChild>
-                                <Link to="/dashboard">
+                                <Link to="/register">
                                     Start Free Trial <ArrowRight className="ml-2 h-5 w-5" />
                                 </Link>
                             </Button>
@@ -191,7 +192,7 @@ const LandingPage = () => {
                             </Button>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:flex gap-6 pt-8">
+                        <div className="grid grid-cols-2 sm:flex gap-6 pt-8 justify-center lg:justify-start">
                             {stats.map((stat, index) => (
                                 <div key={index} className="text-center">
                                     <div className="text-xl sm:text-2xl font-bold text-primary">{stat.value}</div>
@@ -201,150 +202,32 @@ const LandingPage = () => {
                         </div>
                     </div>
 
-                    {/* Login/Register Card */}
+                    {/* Hero Image/Illustration Placeholder */}
                     <div className="w-full lg:max-w-md">
-                        <Card className="shadow-xl border-0">
+                        <Card className="shadow-xl border-0 bg-gradient-to-br from-primary/5 to-primary/10 p-8">
                             <CardHeader className="text-center">
                                 <CardTitle className="text-2xl">
-                                    {isLogin ? 'Welcome Back' : 'Create Account'}
+                                    Ready to Get Started?
                                 </CardTitle>
                                 <CardDescription>
-                                    {isLogin ? 'Sign in to your ServiceERP account' : 'Get started with your 14-day free trial'}
+                                    Join thousands of businesses that trust our ERP platform
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                {!isLogin && (
-                                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                        <TabsList className="grid grid-cols-2 mb-4">
-                                            <TabsTrigger value="business">Business</TabsTrigger>
-                                            <TabsTrigger value="individual">Individual</TabsTrigger>
-                                        </TabsList>
-
-                                        <TabsContent value="business" className="space-y-4">
-                                            <div className="grid gap-2">
-                                                <label className="text-sm font-medium">Company Name</label>
-                                                <Input placeholder="Enter company name" />
-                                            </div>
-                                            <div className="grid gap-2">
-                                                <label className="text-sm font-medium">Industry</label>
-                                                <Input placeholder="e.g. Technology, Healthcare" />
-                                            </div>
-                                        </TabsContent>
-
-                                        <TabsContent value="individual" className="space-y-4">
-                                            <div className="grid gap-2">
-                                                <label className="text-sm font-medium">User Type</label>
-                                                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background">
-                                                    <option value="">Select your role</option>
-                                                    <option value="hr">HR Manager/Staff</option>
-                                                    <option value="finance">Finance Team</option>
-                                                    <option value="contractor">Contractor/Freelancer</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </div>
-                                        </TabsContent>
-                                    </Tabs>
-                                )}
-
+                            <CardContent className="space-y-4 text-center">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Email Address</label>
-                                    <Input
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="h-12"
-                                    />
+                                    <Building2 className="h-12 w-12 mx-auto text-primary" />
+                                    <h3 className="font-semibold">Complete Business Solution</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Everything you need to manage your service business in one place
+                                    </p>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Password</label>
-                                    <div className="relative">
-                                        <Input
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="Enter your password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="h-12 pr-10"
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            className="absolute right-0 top-0 h-12 px-3"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                        >
-                                            {showPassword ? (
-                                                <EyeOff className="h-4 w-4" />
-                                            ) : (
-                                                <Eye className="h-4 w-4" />
-                                            )}
-                                        </Button>
-                                    </div>
-
-                                    {isLogin && (
-                                        <Button variant="link" className="px-0 text-xs h-auto">
-                                            Forgot password?
-                                        </Button>
-                                    )}
-                                </div>
-
-                                {!isLogin && (
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">Confirm Password</label>
-                                        <Input
-                                            type="password"
-                                            placeholder="Confirm your password"
-                                            className="h-12"
-                                        />
-                                    </div>
-                                )}
-
-                                <Button className="w-full h-12" size="lg">
-                                    {isLogin ? (
-                                        <>Sign In <ArrowRight className="ml-2 h-4 w-4" /></>
-                                    ) : (
-                                        <>Create Account <UserPlus className="ml-2 h-4 w-4" /></>
-                                    )}
-                                </Button>
-
-                                <div className="text-center text-sm">
-                                    {isLogin ? (
-                                        <>
-                                            Don't have an account?{' '}
-                                            <Button variant="link" className="p-0" onClick={() => setIsLogin(false)}>
-                                                Sign up
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            Already have an account?{' '}
-                                            <Button variant="link" className="p-0" onClick={() => setIsLogin(true)}>
-                                                Sign in
-                                            </Button>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <span className="w-full border-t" />
-                                    </div>
-                                    <div className="relative flex justify-center text-xs uppercase">
-                                        <span className="bg-background px-2 text-muted-foreground">
-                                            Or continue with
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Button variant="outline" className="h-10">
-                                        <Globe className="mr-2 h-4 w-4" />
-                                        Google
+                                <div className="grid grid-cols-2 gap-4 pt-4">
+                                    <Button asChild variant="outline">
+                                        <Link to="/login">Sign In</Link>
                                     </Button>
-                                    <Button variant="outline" className="h-10">
-                                        <Lock className="mr-2 h-4 w-4" />
-                                        SSO
+                                    <Button asChild>
+                                        <Link to="/register">Register</Link>
                                     </Button>
                                 </div>
                             </CardContent>
@@ -457,8 +340,8 @@ const LandingPage = () => {
                         Join thousands of service businesses that use ServiceERP to streamline operations and drive growth
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button size="lg" variant="secondary" className="text-base sm:text-lg py-4 sm:py-6 px-6 sm:px-8">
-                            Start Free Trial
+                        <Button size="lg" variant="secondary" className="text-base sm:text-lg py-4 sm:py-6 px-6 sm:px-8" asChild>
+                            <Link to="/register">Start Free Trial</Link>
                         </Button>
                         <Button size="lg" variant="outline" className="text-base sm:text-lg py-4 sm:py-6 px-6 sm:px-8 bg-transparent text-white border-white hover:bg-white hover:text-primary">
                             Schedule Demo

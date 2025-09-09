@@ -1,15 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React, { useEffect, useState, Suspense, lazy } from "react";
+import { Toaster } from "sonner";
 
 import './App.css'
 import { ThemeProvider } from "./lib/theme-provider";
 import { TooltipProvider } from "./components/ui/tooltip";
-import { PageLoading, ContentSkeleton, AppLoading } from "./components/layout/Loading";
+import { PageLoading, ContentSkeleton } from "./components/layout/Loading";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { MinimalLayout } from "./components/layout/MinimalLayout";
 
 // Lazy load pages for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const WaitingApproval = lazy(() => import('./pages/WaitingApproval'));
 const MainDashboard = lazy(() => import('./pages/MainDashboard'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
 const CRMPage = lazy(() => import('./pages/CRMPage'));
@@ -17,6 +20,7 @@ const FinancePage = lazy(() => import('./pages/FinancePage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 
 const HREmployeesPage = lazy(() => import('./pages/HR/HREmployeesPage'));
+const LeaveRequestsPage = lazy(() => import('./pages/HR/LeaveRequestsPage'));
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
@@ -56,17 +60,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 }
 
 function App() {
-  const [isAppLoading, setIsAppLoading] = useState(true);
   const [navigationState, setNavigationState] = useState<'idle' | 'navigating'>('idle');
-
-  // Simulate Application Loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsAppLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle navigation events for loading states
   useEffect(() => {
@@ -83,12 +77,9 @@ function App() {
     };
   }, []);
 
-  if (isAppLoading) {
-    return <AppLoading />;
-  }
-
   return (
     <ErrorBoundary>
+      <Toaster position="top-center" />
       <TooltipProvider>
         <Router>
           <ThemeProvider>
@@ -115,9 +106,15 @@ function App() {
                   </MinimalLayout>
                 } />
 
+                <Route path="/waiting-approval" element={
+                  <MinimalLayout>
+                    <WaitingApproval />
+                  </MinimalLayout>
+                } />
+
                 <Route path="/register" element={
                   <MinimalLayout>
-                    <div>Register Page</div>
+                    <RegistrationPage />
                   </MinimalLayout>
                 } />
 
@@ -133,7 +130,13 @@ function App() {
                     <HREmployeesPage />
                   </DashboardLayout>
                 } />
-                
+
+                <Route path="/hr/leave" element={
+                  <DashboardLayout title="Leave Management">
+                    <LeaveRequestsPage />
+                  </DashboardLayout>
+                } />
+
                 <Route path="/projects/*" element={
                   <DashboardLayout title="Projects">
                     <Suspense fallback={<ContentSkeleton />}>
