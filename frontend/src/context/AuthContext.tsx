@@ -2,12 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 
 type User = {
-  id: string;
-  email: string;
-  roles: ('ADMIN' | 'HR' | 'CONTRACTOR' | 'FINANCE' | 'EMPLOYEE')[];
-  firstName: string;
-  lastName: string;
-  createdAt: string;
+    id: string;
+    email: string;
+    roles: ('ADMIN' | 'HR' | 'CONTRACTOR' | 'FINANCE' | 'EMPLOYEE')[];
+    firstName: string;
+    lastName: string;
+    createdAt: string;
 }
 
 interface AuthContextType {
@@ -90,16 +90,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const login = async (email: string, password: string) => {
         try {
-            const response = await api.post('/auth/login', { email, password });
-            const { user: userData, token } = response.data;
+            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Login failed');
+            }
 
             // Store token and user data in localStorage
-            storage.set(JWT_TOKEN_KEY, token);
-            storage.set(USER_DATA_KEY, userData);
-            setUser(userData);
+            storage.set(JWT_TOKEN_KEY, data.accessToken);
+            storage.set(USER_DATA_KEY, data.user);
+            setUser(data.user);
+
         } catch (error: any) {
             console.error('Login failed:', error);
-            throw new Error(error.response?.data?.message || 'Login failed');
+            throw new Error(error.message || 'Login failed');
         }
     };
 
