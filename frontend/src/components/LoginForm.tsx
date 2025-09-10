@@ -37,7 +37,7 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const from = location.state?.from?.pathname || '/';
+    const from = location.state?.from?.pathname || '/dashboard';
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
