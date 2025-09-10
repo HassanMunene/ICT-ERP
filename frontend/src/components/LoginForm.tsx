@@ -79,7 +79,7 @@ export default function LoginForm() {
                     } else if (userRoles.includes('EMPLOYEE')) {
                         navigate('/employee', { replace: true });
                     } else {
-                        navigate('/unauthorized', { replace: true });
+                        navigate('/dashboard', { replace: true });
                     }
                 }
             } else if (data?.requiresApproval) {

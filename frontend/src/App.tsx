@@ -10,6 +10,7 @@ import { ContentSkeleton } from "./components/layout/Loading";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { MinimalLayout } from "./components/layout/MinimalLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { RoleBasedRedirect } from "./components/RoleBasedRedirect";
 
 // Lazy load pages
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -27,6 +28,7 @@ const EmployeeDashboard = lazy(() => import('./pages/EmployeeDashboard'));
 const HREmployeesPage = lazy(() => import('./pages/HR/HREmployeesPage'));
 const LeaveRequestsPage = lazy(() => import('./pages/HR/LeaveRequestsPage'));
 
+// In your AppRoutes component
 function AppRoutes() {
 	return (
 		<Routes>
@@ -37,7 +39,14 @@ function AppRoutes() {
 			<Route path="/waiting-approval" element={<MinimalLayout><WaitingApproval /></MinimalLayout>} />
 			<Route path="/unauthorized" element={<MinimalLayout><UnauthorizedPage /></MinimalLayout>} />
 
-			{/* Protected Routes */}
+			{/* Role-based dashboard redirect */}
+			<Route path="/dashboard" element={
+				<ProtectedRoute>
+					<RoleBasedRedirect />
+				</ProtectedRoute>
+			} />
+
+			{/* Admin Dashboard */}
 			<Route path="/admin/*" element={
 				<ProtectedRoute allowedRoles={['ADMIN']}>
 					<DashboardLayout title="Administration">
@@ -48,34 +57,20 @@ function AppRoutes() {
 				</ProtectedRoute>
 			} />
 
-			{/* HR Routes */}
-			<Route path="/hr/employees" element={
+			{/* HR Dashboard - Use nested routes */}
+			<Route path="/hr/*" element={
 				<ProtectedRoute allowedRoles={['HR', 'ADMIN']}>
-					<DashboardLayout title="Employee Management">
-						<HREmployeesPage />
+					<DashboardLayout title="Human Resources">
+						<Routes>
+							<Route index element={<div>HR</div>} />
+							<Route path="employees" element={<HREmployeesPage />} />
+							<Route path="leave" element={<LeaveRequestsPage />} />
+						</Routes>
 					</DashboardLayout>
 				</ProtectedRoute>
 			} />
 
-			<Route path="/hr/leave" element={
-				<ProtectedRoute allowedRoles={['HR', 'ADMIN']}>
-					<DashboardLayout title="Leave Management">
-						<LeaveRequestsPage />
-					</DashboardLayout>
-				</ProtectedRoute>
-			} />
-
-			{/* Other protected routes */}
-			<Route path="/crm/*" element={
-				<ProtectedRoute allowedRoles={['HR', 'ADMIN']}>
-					<DashboardLayout title="CRM">
-						<Suspense fallback={<ContentSkeleton />}>
-							<CRMPage />
-						</Suspense>
-					</DashboardLayout>
-				</ProtectedRoute>
-			} />
-
+			{/* Finance Dashboard */}
 			<Route path="/finance/*" element={
 				<ProtectedRoute allowedRoles={['FINANCE', 'ADMIN']}>
 					<DashboardLayout title="Finance">
@@ -86,6 +81,7 @@ function AppRoutes() {
 				</ProtectedRoute>
 			} />
 
+			{/* Projects Dashboard */}
 			<Route path="/projects/*" element={
 				<ProtectedRoute allowedRoles={['CONTRACTOR', 'EMPLOYEE', 'ADMIN']}>
 					<DashboardLayout title="Projects">
@@ -96,7 +92,7 @@ function AppRoutes() {
 				</ProtectedRoute>
 			} />
 
-			{/* Employee route */}
+			{/* Employee Dashboard */}
 			<Route path="/employee/*" element={
 				<ProtectedRoute allowedRoles={['EMPLOYEE']}>
 					<DashboardLayout title="My Dashboard">
@@ -107,10 +103,13 @@ function AppRoutes() {
 				</ProtectedRoute>
 			} />
 
-			<Route path="/dashboard" element={
-				<ProtectedRoute>
-					<DashboardLayout title="Dashboard">
-						<MainDashboard />
+			{/* CRM Dashboard */}
+			<Route path="/crm/*" element={
+				<ProtectedRoute allowedRoles={['HR', 'ADMIN']}>
+					<DashboardLayout title="CRM">
+						<Suspense fallback={<ContentSkeleton />}>
+							<CRMPage />
+						</Suspense>
 					</DashboardLayout>
 				</ProtectedRoute>
 			} />
