@@ -2,12 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 
 type User = {
-    id: string;
-    email: string;
-    role: 'ADMIN' | 'HR' | 'CONTRACTOR' | 'FINANCE';
-    firstName: '';
-    lastName: '';
-    createdAt: string;
+  id: string;
+  email: string;
+  roles: ('ADMIN' | 'HR' | 'CONTRACTOR' | 'FINANCE' | 'EMPLOYEE')[];
+  firstName: string;
+  lastName: string;
+  createdAt: string;
 }
 
 interface AuthContextType {
