@@ -19,7 +19,7 @@ export const RoleBasedRedirect = () => {
     if (userRoles.includes('ADMIN')) {
         return <Navigate to="/admin" replace />;
     } else if (userRoles.includes('HR')) {
-        return <Navigate to="/hr/employees" replace />;
+        return <Navigate to="/hr" replace />;
     } else if (userRoles.includes('FINANCE')) {
         return <Navigate to="/finance" replace />;
     } else if (userRoles.includes('CONTRACTOR')) {

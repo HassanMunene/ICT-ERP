@@ -37,7 +37,7 @@ export default function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const from = location.state?.from?.pathname || '/dashboard';
+    const from = location.state?.from?.pathname || '/';
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -62,7 +62,26 @@ export default function LoginForm() {
 
             if (response.ok) {
                 toast.success('Login successful.');
-                navigate(from, { replace: true });
+                // Check if there's a specific page the user was trying to access
+                if (from && from !== '/') {
+                    navigate(from, { replace: true });
+                } else {
+                    // If no specific destination, redirect based on role
+                    const userRoles = data.user?.roles || [];
+                    if (userRoles.includes('ADMIN')) {
+                        navigate('/admin', { replace: true });
+                    } else if (userRoles.includes('HR')) {
+                        navigate('/hr', { replace: true });
+                    } else if (userRoles.includes('FINANCE')) {
+                        navigate('/finance', { replace: true });
+                    } else if (userRoles.includes('CONTRACTOR')) {
+                        navigate('/projects', { replace: true });
+                    } else if (userRoles.includes('EMPLOYEE')) {
+                        navigate('/employee', { replace: true });
+                    } else {
+                        navigate('/unauthorized', { replace: true });
+                    }
+                }
             } else if (data?.requiresApproval) {
                 toast.error('Account pending approval. Please contact administrator.');
                 navigate('/waiting-approval');
