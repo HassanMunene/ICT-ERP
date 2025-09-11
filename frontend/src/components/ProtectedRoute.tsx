@@ -17,6 +17,8 @@ export const ProtectedRoute = ({
     const { user, isAuthenticated, loading } = useAuth();
     const location = useLocation();
 
+    console.log("Rayaayyaay", user);
+
     if (loading) {
         return <PageLoading />;
     }

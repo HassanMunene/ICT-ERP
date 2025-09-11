@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/card';
 import { Eye, EyeOff, Loader2, ArrowLeft, Shield, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 // Validation schema
 const formSchema = z.object({
@@ -36,6 +37,7 @@ export default function LoginForm() {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const { login } = useAuth();
 
     const from = location.state?.from?.pathname || '/';
 
@@ -50,48 +52,40 @@ export default function LoginForm() {
     async function onSubmit(values: FormValues) {
         setIsLoading(true);
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(values),
-            });
-            const data = await response.json();
+            // Use the login function from AuthContext
+            await login(values.email, values.password);
 
-            if (response.ok) {
-                toast.success('Login successful.');
-                // Check if there's a specific page the user was trying to access
-                if (from && from !== '/') {
-                    navigate(from, { replace: true });
-                } else {
-                    // If no specific destination, redirect based on role
-                    const userRoles = data.user?.roles || [];
-                    if (userRoles.includes('ADMIN')) {
-                        navigate('/admin', { replace: true });
-                    } else if (userRoles.includes('HR')) {
-                        navigate('/hr', { replace: true });
-                    } else if (userRoles.includes('FINANCE')) {
-                        navigate('/finance', { replace: true });
-                    } else if (userRoles.includes('CONTRACTOR')) {
-                        navigate('/projects', { replace: true });
-                    } else if (userRoles.includes('EMPLOYEE')) {
-                        navigate('/employee', { replace: true });
-                    } else {
-                        navigate('/dashboard', { replace: true });
-                    }
-                }
-            } else if (data?.requiresApproval) {
-                toast.error('Account pending approval. Please contact administrator.');
-                navigate('/waiting-approval');
+            toast.success('Login successful.');
+
+            // Check if there's a specific page the user was trying to access
+            if (from && from !== '/') {
+                navigate(from, { replace: true });
             } else {
-                toast.error(data.message || 'Login failed. Please try again.');
-
+                // If no specific destination, redirect based on role
+                // Since the user is now in context, we can access it from there
+                const userRoles = useAuth().user?.roles || [];
+                if (userRoles.includes('ADMIN')) {
+                    navigate('/admin', { replace: true });
+                } else if (userRoles.includes('HR')) {
+                    navigate('/hr', { replace: true });
+                } else if (userRoles.includes('FINANCE')) {
+                    navigate('/finance', { replace: true });
+                } else if (userRoles.includes('CONTRACTOR')) {
+                    navigate('/projects', { replace: true });
+                } else if (userRoles.includes('EMPLOYEE')) {
+                    navigate('/employee', { replace: true });
+                } else {
+                    navigate('/dashboard', { replace: true });
+                }
             }
 
         } catch (error: any) {
-            toast.error(error.message || 'Login failed. Please check your credentials.');
+            if (error.message?.includes('pending approval')) {
+                toast.error('Account pending approval. Please contact administrator.');
+                navigate('/waiting-approval');
+            } else {
+                toast.error(error.message || 'Login failed. Please check your credentials.');
+            }
         } finally {
             setIsLoading(false);
         }
