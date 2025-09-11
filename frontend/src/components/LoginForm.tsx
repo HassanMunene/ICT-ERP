@@ -219,7 +219,7 @@ export default function LoginForm() {
                         {/* Demo Accounts Hint */}
                         <div className="mt-8 p-4 bg-muted/50 rounded-lg">
                             <p className="text-xs text-muted-foreground text-center">
-                                💡 Demo: Try admin@icterp.com / password123
+                                💡 Demo: Try admin@company.com / admin123
                             </p>
                         </div>
                     </CardContent>
